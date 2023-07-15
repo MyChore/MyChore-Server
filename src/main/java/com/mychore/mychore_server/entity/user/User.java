@@ -1,6 +1,6 @@
 package com.mychore.mychore_server.entity.user;
 
-import com.mychore.mychore_server.constant.Provider;
+import com.mychore.mychore_server.global.constants.Provider;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

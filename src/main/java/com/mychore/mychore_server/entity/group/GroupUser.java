@@ -1,6 +1,6 @@
 package com.mychore.mychore_server.entity.group;
 
-import com.mychore.mychore_server.constant.Role;
+import com.mychore.mychore_server.global.constants.Role;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.user.User;
 import jakarta.persistence.*;
