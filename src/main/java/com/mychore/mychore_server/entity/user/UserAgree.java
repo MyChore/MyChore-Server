@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 public class UserAgree extends BaseEntity {
 
+    @Id @GeneratedValue
+    private Long id;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

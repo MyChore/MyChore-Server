@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.group;
 
+import com.mychore.mychore_server.constant.FloorType;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

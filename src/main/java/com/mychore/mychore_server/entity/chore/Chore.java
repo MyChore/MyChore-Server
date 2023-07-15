@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.chore;
 
+import com.mychore.mychore_server.constant.Repetition;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;

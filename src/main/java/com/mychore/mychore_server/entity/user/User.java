@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.user;
 
+import com.mychore.mychore_server.constant.Provider;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,5 +33,5 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @NonNull
-    private  Provider provider;
+    private Provider provider;
 }
