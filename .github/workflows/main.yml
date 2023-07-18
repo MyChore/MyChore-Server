@@ -56,7 +56,7 @@ jobs:
       run: cp ./scripts/*.sh ./deploy
 
     - name: Make zip file
-      run: zip -r ./coinTalk.zip ./deploy
+      run: zip -r ./mychore.zip ./deploy
       shell: bash
 
     - name: Configure AWS credentials
@@ -67,7 +67,7 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./coinTalk.zip s3://$S3_BUCKET_NAME/
+      run: aws s3 cp --region ap-northeast-2 ./mychore.zip s3://$S3_BUCKET_NAME/
 
     # Deploy
     - name: Deploy
@@ -76,8 +76,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         aws deploy create-deployment \
-        --application-name coinTalk[만든 애플리케이션 이름] \
-        --deployment-group-name coinTalk-group[만든 애플리케이션 그룹 이름] \
+        --application-name myChore \
+        --deployment-group-name myChore-group \
         --file-exists-behavior OVERWRITE \
-        --s3-location bucket=cointalk-deploy[S3버킷이름],bundleType=zip,key=coinTalk.zip[S3버킷 속 압축파일] \ 
+        --s3-location bucket=myChore-deploy,bundleType=zip,key=myChore.zip \ 
         --region ap-northeast-2
