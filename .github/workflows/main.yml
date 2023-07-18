@@ -8,6 +8,9 @@ on:
 
 env:
   S3_BUCKET_NAME: mychore-deploy
+  ZIP_FILE_NAME: myChore
+  CODEDEPLOY_NAME: myChore
+  CODEDEPLOY_GROUP: myChore-group
 
 jobs:
   build:
@@ -56,7 +59,7 @@ jobs:
       run: cp ./scripts/*.sh ./deploy
 
     - name: Make zip file
-      run: zip -r ./mychore.zip ./deploy
+      run: zip -r ./ZIP_FILE_NAME.zip ./deploy
       shell: bash
 
     - name: Configure AWS credentials
@@ -67,17 +70,11 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./mychore.zip s3://$S3_BUCKET_NAME/
+      run: aws s3 cp --region ap-northeast-2 ./ZIP_FILE_NAME.zip s3://$S3_BUCKET_NAME/
 
     # Deploy
     - name: Deploy
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: |
-        aws deploy create-deployment \
-        --application-name myChore \
-        --deployment-group-name myChore-group \
-        --file-exists-behavior OVERWRITE \
-        --s3-location bucket=mychore-deploy,bundleType=zip,key=mychore.zip \ 
-        --region ap-northeast-2
+      run: aws deploy create-deployment --application-name $CODEDEPLOY_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODEDEPLOY_GROUP --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$ZIP_FILE_NAME.zip
