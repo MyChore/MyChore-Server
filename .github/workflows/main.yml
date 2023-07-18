@@ -79,5 +79,5 @@ jobs:
         --application-name myChore \
         --deployment-group-name myChore-group \
         --file-exists-behavior OVERWRITE \
-        --s3-location bucket=myChore-deploy,bundleType=zip,key=mychore.zip \ 
+        --s3-location bucket=mychore-deploy,bundleType=zip,key=mychore.zip \ 
         --region ap-northeast-2
