@@ -11,25 +11,35 @@ import java.time.LocalDateTime;
 @Getter
 public class UserAgree extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_agree_id")
     private Long id;
+
+    @NonNull
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @NonNull
-    private Boolean ageStatus = false;
+    @Column(name = "is_14_over", columnDefinition = "BOOLEAN")
+    private Boolean is14Over;
 
-    private LocalDateTime promotion;
-
-    @NonNull
-    private Boolean todayNoti = false;
+    private LocalDateTime acceptEmailDate;
 
     @NonNull
-    private Boolean newUserNoti = false;
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isAcceptTodayNoti = true;
 
     @NonNull
-    private Boolean doneNoti = false;
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isAcceptNewUserNoti = true;
 
-    private Boolean deleteNoti = false;
+    @NonNull
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isAcceptDoneNoti = true;
+
+    @NonNull
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isAcceptDeleteNoti = true;
 }

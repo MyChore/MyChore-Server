@@ -3,16 +3,20 @@ package com.mychore.mychore_server.entity.user;
 import com.mychore.mychore_server.global.constants.Provider;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class User extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -27,11 +31,11 @@ public class User extends BaseEntity {
     @Column(length = 10)
     private String gender;
 
-    private LocalDateTime birth;
+    private LocalDate birth;
 
-    private String profileImgKey;
+    private String imgKey;
 
-    @Enumerated(EnumType.STRING)
     @NonNull
+    @Enumerated(EnumType.STRING)
     private Provider provider;
 }

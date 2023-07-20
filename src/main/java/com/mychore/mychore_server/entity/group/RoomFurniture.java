@@ -13,24 +13,28 @@ import lombok.NonNull;
 public class RoomFurniture extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_furn_id")
     private Long id;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "furniture_id")
     private Furniture furniture;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
 
     @NonNull
-    private int locationX;
+    @Column(name = "location_x")
+    private Integer locationX;
 
     @NonNull
-    private int locationY;
+    @Column(name = "location_y")
+    private Integer locationY;
 
     @NonNull
-    private int rotation;
+    private Integer rotation;
 }

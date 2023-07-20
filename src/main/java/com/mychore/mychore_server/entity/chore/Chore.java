@@ -6,7 +6,10 @@ import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.time.LocalDateTime;
 
@@ -14,17 +17,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Chore extends BaseEntity {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chore_id")
     private Long id;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_furn_id")
     private RoomFurniture roomFurniture;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
@@ -32,6 +40,10 @@ public class Chore extends BaseEntity {
     @NonNull
     @Column(length = 20)
     private String name;
+
+    @NonNull
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isAcceptNoti = true;
 
     @NonNull
     private LocalDateTime startDate;

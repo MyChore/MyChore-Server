@@ -1,10 +1,7 @@
 package com.mychore.mychore_server.entity.group;
 
 import com.mychore.mychore_server.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,15 +12,18 @@ import lombok.NonNull;
 @Getter
 public class Furniture extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "furniture_id")
     private Long id;
 
     @NonNull
-    private int sizeX;
+    @Column(name = "size_x")
+    private Integer sizeX;
 
     @NonNull
-    private int sizeY;
+    @Column(name = "size_y")
+    private Integer sizeY;
 
     @NonNull
     @Column(length = 10)

@@ -11,21 +11,23 @@ import lombok.NonNull;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Table(name = "floor_group")
 public class Group extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "group_id")
     private Long id;
 
     @NonNull
-    @Column(length = 10)
+    @Column(length = 8)
     private String inviteCode;
 
     @NonNull
     @Column(length = 10)
     private String name;
 
-    @Enumerated(EnumType.STRING)
     @NonNull
+    @Enumerated(EnumType.STRING)
     private FloorType floorType;
 }

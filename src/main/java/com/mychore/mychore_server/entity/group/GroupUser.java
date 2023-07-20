@@ -14,19 +14,22 @@ import lombok.NonNull;
 @Getter
 public class GroupUser extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "group_user_id")
     private Long id;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
+    @NonNull
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated(EnumType.STRING)
     @NonNull
+    @Enumerated(EnumType.STRING)
     private Role role;
 }
