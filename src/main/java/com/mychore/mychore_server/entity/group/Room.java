@@ -13,30 +13,37 @@ import lombok.NonNull;
 @Getter
 public class Room extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
     private Long id;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
     @NonNull
-    private int sizeX;
+    @Column(length = 10)
+    private String name;
 
     @NonNull
-    private int sizeY;
+    @Column(name = "size_x")
+    private Integer sizeX;
 
     @NonNull
-    private int locationX;
+    @Column(name = "size_y")
+    private Integer sizeY;
 
     @NonNull
-    private int locationY;
+    @Column(name = "location_x")
+    private Integer locationX;
 
     @NonNull
-    private int rotation;
+    @Column(name = "location_y")
+    private Integer locationY;
 
+    @NonNull
     @Enumerated(EnumType.STRING)
-    @NonNull
     private RoomType roomType;
 }
