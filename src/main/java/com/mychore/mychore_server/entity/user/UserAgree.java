@@ -3,11 +3,15 @@ package com.mychore.mychore_server.entity.user;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@DynamicUpdate
 @Getter
 public class UserAgree extends BaseEntity {
 
@@ -42,4 +46,11 @@ public class UserAgree extends BaseEntity {
     @NonNull
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean isAcceptDeleteNoti = true;
+
+    @Builder
+    public UserAgree(@NonNull User user, @NonNull Boolean is14Over, LocalDateTime acceptEmailDate) {
+        this.user = user;
+        this.is14Over = is14Over;
+        this.acceptEmailDate = acceptEmailDate;
+    }
 }
