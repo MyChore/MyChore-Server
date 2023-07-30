@@ -18,5 +18,11 @@ spring:
       hibernate:
         format_sql: true
 
+  data:
+    redis:
+      port: 6379
+      host: ENC(vLVhrzCkSK8pdu8QVTffxDfjKCUmPK1n)
+      password: ENC(58HEyUIvEGShHr+XXEpx9jlbyQ0Wr6JT)
+
   profiles:
     include: secret
