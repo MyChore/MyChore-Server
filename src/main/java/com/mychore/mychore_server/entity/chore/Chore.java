@@ -99,10 +99,5 @@ public class Chore extends BaseEntity {
         this.roomFurniture = roomFurniture;
     }
 
-    public void setNotiTime(LocalTime time) {
-        this.notiTime = time;
-    }
-
-
 
 }

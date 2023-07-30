@@ -28,18 +28,18 @@ public class ChoreCreateReq {
     private Repetition repetition;
     private LocalTime notiTime;
 
-    public Chore toEntity(User user, RoomFurniture roomFurniture, Group group) {
-
-        return Chore.builder()
-                .user(user)
-                .roomFurniture(roomFurniture)
-                .group(group)
-                .name(this.name)
-                .isAcceptNoti(this.isAcceptNoti==null ? true : this.isAcceptNoti)
-                .startDate(this.startDate)
-                .lastDate(this.repetition==null? this.startDate : this.lastDate)
-                .repetition(this.repetition)
-                .notiTime(this.isAcceptNoti==true ? this.notiTime : null)
-                .build();
-    }
+//    public Chore toEntity(User user, RoomFurniture roomFurniture, Group group) {
+//
+//        return Chore.builder()
+//                .user(user)
+//                .roomFurniture(roomFurniture)
+//                .group(group)
+//                .name(this.name)
+//                .isAcceptNoti(this.isAcceptNoti==null ? true : this.isAcceptNoti)
+//                .startDate(this.startDate)
+//                .lastDate(this.repetition==null? this.startDate : this.lastDate)
+//                .repetition(this.repetition)
+//                .notiTime(this.isAcceptNoti==true ? this.notiTime : null)
+//                .build();
+//    }
 }
