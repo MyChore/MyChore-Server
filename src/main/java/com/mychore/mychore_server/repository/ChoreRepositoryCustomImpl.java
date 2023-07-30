@@ -1,6 +1,6 @@
 package com.mychore.mychore_server.repository;
 
-import com.mychore.mychore_server.dto.ChoreDto;
+import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.global.constants.Repetition;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +22,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
     private final EntityManager em;
 
     @Override
-    public List<ChoreDto.Response> findChores(Long userId, Long groupId, Long roomId, LocalDate fromTime, LocalDate toTime) {
+    public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId, LocalDate fromTime, LocalDate toTime) {
 
         // 집안일 필터링해서 가져오기
         String query = "select c " +
@@ -55,7 +54,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
 
         List<Chore> choreResponses = choreTypedQuery.getResultList();
 
-        List<ChoreDto.Response> choreLists = new ArrayList<>();
+        List<ChoreDetailResp> choreLists = new ArrayList<>();
 
         // 집안일의 로그를 찾고 DTO로 변환후 리스트 반환
         for (Chore choreResponse : choreResponses) {
@@ -137,8 +136,8 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
     }
 
     // 새로운 ChoreDto.Response 객체를 생성하고 ChoreResponse 정보에 setDate, setCompleteStatus 설정하여 반환하는 함수
-    private ChoreDto.Response createChoreDtoResponse(Chore choreResponse, List<ChoreLog> choreLogList, LocalDate currentDate) {
-        ChoreDto.Response newResp = new ChoreDto.Response(choreResponse);
+    private ChoreDetailResp createChoreDtoResponse(Chore choreResponse, List<ChoreLog> choreLogList, LocalDate currentDate) {
+        ChoreDetailResp newResp = new ChoreDetailResp(choreResponse);
         newResp.setSetDate(currentDate);
 
         ChoreLog choreLog = findChoreLogForDate(choreLogList, currentDate);

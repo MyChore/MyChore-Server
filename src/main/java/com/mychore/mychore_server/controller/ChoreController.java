@@ -1,15 +1,15 @@
 package com.mychore.mychore_server.controller;
 
-import com.mychore.mychore_server.dto.ChoreDto;
 import com.mychore.mychore_server.dto.ResponseCustom;
+import com.mychore.mychore_server.dto.chore.request.ChoreCreateReq;
+import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
+import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
+import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
 import com.mychore.mychore_server.service.ChoreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,7 +26,7 @@ public class ChoreController {
      */
     @PostMapping
     public ResponseCustom<String> saveChoreAPI(
-            @RequestBody ChoreDto.Create choreSaveReqDto) {
+            @RequestBody ChoreCreateReq choreSaveReqDto) {
 
         return choreService.saveChore(choreSaveReqDto);
     }
@@ -42,13 +42,13 @@ public class ChoreController {
      * @return
      */
     @GetMapping
-    public ResponseCustom<List<ChoreDto.Response>> getChoresAPI(
+    public ResponseCustom<List<ChoreDetailResp>> getChoresAPI(
             @RequestParam Long userId,
             @RequestParam Long groupId,
             @RequestParam(required = false) Long roomId,
             @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
 
-        List<ChoreDto.Response> chores =
+        List<ChoreDetailResp> chores =
                 choreService.findChores(userId, groupId, roomId, fromDate, toDate);
 
         return ResponseCustom.OK(chores);
@@ -61,10 +61,10 @@ public class ChoreController {
      * @return
      */
     @GetMapping("/{choreId}")
-    public ResponseCustom<ChoreDto.EntityResponse> getChoreAPI(
+    public ResponseCustom<ChoreSimpleResp> getChoreAPI(
             @PathVariable Long choreId) {
 
-        ChoreDto.EntityResponse chore = choreService.findChore(choreId);
+        ChoreSimpleResp chore = choreService.findChore(choreId);
         return ResponseCustom.OK(chore);
     }
 
@@ -95,7 +95,7 @@ public class ChoreController {
     @PatchMapping("/{choreId}")
     public ResponseCustom<String> updateChoreAPI(
             @PathVariable Long choreId,
-            @RequestBody ChoreDto.Update choreUpdateReqDto) {
+            @RequestBody ChoreUpdateReq choreUpdateReqDto) {
 
         return choreService.updateChore(choreId, choreUpdateReqDto);
     }

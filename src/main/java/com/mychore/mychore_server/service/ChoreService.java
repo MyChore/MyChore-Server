@@ -1,7 +1,10 @@
 package com.mychore.mychore_server.service;
 
-import com.mychore.mychore_server.dto.ChoreDto;
 import com.mychore.mychore_server.dto.ResponseCustom;
+import com.mychore.mychore_server.dto.chore.request.ChoreCreateReq;
+import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
+import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
+import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
@@ -18,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,7 +39,7 @@ public class ChoreService {
      * 집안일 생성
      * @return ResponseCustom<String>
      */
-    public ResponseCustom<String> saveChore(ChoreDto.Create choreSaveReqDto) {
+    public ResponseCustom<String> saveChore(ChoreCreateReq choreSaveReqDto) {
 
         isValidSaveReqBody(choreSaveReqDto);
 
@@ -55,19 +57,19 @@ public class ChoreService {
     /**
      * id를 통한 집안일 단건 조회
      * @param choreId
-     * @return ChoreDto.Response
+     * @return ChoreSimpleResp
      */
-    public ChoreDto.EntityResponse findChore(Long choreId) {
+    public ChoreSimpleResp findChore(Long choreId) {
         return findChoreEntity(choreId)
                 .toDto();
     }
 
     /**
      * parameter를 통한 집안일 다건 조회
-     * @return List<ChoreDto.Response>
+     * @return List<ChoreDetailResp>
      */
-    public List<ChoreDto.Response> findChores(Long userId, Long groupId, Long roomId,
-                                              LocalDate fromTime, LocalDate toTime) {
+    public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId,
+                                            LocalDate fromTime, LocalDate toTime) {
 
         isValidfindChoresParameter(userId, groupId, roomId, fromTime, toTime);
 
@@ -80,7 +82,7 @@ public class ChoreService {
      * @param choreUpdateReqDto
      * @return ResponseCustom<String>
      */
-    public ResponseCustom<String> updateChore(Long choreId, ChoreDto.Update choreUpdateReqDto) {
+    public ResponseCustom<String> updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto) {
 
         Chore findChore = findChoreEntity(choreId);
 
@@ -229,7 +231,7 @@ public class ChoreService {
     }
 
     // updateChore 검증
-    private Void isValidUpdateReqBody(Chore chore, ChoreDto.Update choreUpdateReqDto) {
+    private Void isValidUpdateReqBody(Chore chore, ChoreUpdateReq choreUpdateReqDto) {
         String result = "";
 
         if (choreUpdateReqDto.getIsAcceptNoti()!=null) {
@@ -285,7 +287,7 @@ public class ChoreService {
     }
 
     // saveChore Req 확인 함수
-    private Void isValidSaveReqBody(ChoreDto.Create choreSaveReqDto) {
+    private Void isValidSaveReqBody(ChoreCreateReq choreSaveReqDto) {
 
         String result = "";
 

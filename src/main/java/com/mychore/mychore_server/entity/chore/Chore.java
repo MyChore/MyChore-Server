@@ -1,6 +1,7 @@
 package com.mychore.mychore_server.entity.chore;
 
-import com.mychore.mychore_server.dto.ChoreDto;
+import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
+import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
 import com.mychore.mychore_server.global.constants.Repetition;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.group.Group;
@@ -11,9 +12,7 @@ import lombok.*;
 import lombok.Builder;
 
 
-import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +65,8 @@ public class Chore extends BaseEntity {
     @OneToMany(mappedBy = "chore")
     private List<ChoreLog> choreLogList = new ArrayList<>();
 
-    public ChoreDto.EntityResponse toDto() {
-        return ChoreDto.EntityResponse.builder()
+    public ChoreSimpleResp toDto() {
+        return ChoreSimpleResp.builder()
                 .id(this.id)
                 .userId(this.user.getId())
                 .roomFurnitureId(this.roomFurniture.getId())
@@ -82,7 +81,7 @@ public class Chore extends BaseEntity {
                 .build();
     }
 
-    public void updateInfo(ChoreDto.Update choreUpdateReqDto) {
+    public void updateInfo(ChoreUpdateReq choreUpdateReqDto) {
         if (choreUpdateReqDto.getName() != null) this.name = choreUpdateReqDto.getName();
         if (choreUpdateReqDto.getIsAcceptNoti() != null) this.isAcceptNoti = choreUpdateReqDto.getIsAcceptNoti();
         if (choreUpdateReqDto.getStartDate() != null) this.startDate = choreUpdateReqDto.getStartDate();
