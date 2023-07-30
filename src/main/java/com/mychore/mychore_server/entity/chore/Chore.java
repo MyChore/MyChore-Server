@@ -1,19 +1,26 @@
 package com.mychore.mychore_server.entity.chore;
 
+import com.mychore.mychore_server.dto.ChoreDto;
 import com.mychore.mychore_server.global.constants.Repetition;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import lombok.Builder;
 
+
+import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Builder
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Chore extends BaseEntity {
@@ -46,10 +53,57 @@ public class Chore extends BaseEntity {
     private Boolean isAcceptNoti = true;
 
     @NonNull
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
-    private LocalDateTime lastDate;
+    private LocalDate lastDate;
+
+    @Column(name = "noti_time")
+    private LocalTime notiTime;
 
     @Enumerated(EnumType.STRING)
     private Repetition repetition;
+
+    @OneToMany(mappedBy = "chore")
+    private List<ChoreLog> choreLogList = new ArrayList<>();
+
+    public ChoreDto.EntityResponse toDto() {
+        return ChoreDto.EntityResponse.builder()
+                .id(this.id)
+                .userId(this.user.getId())
+                .roomFurnitureId(this.roomFurniture.getId())
+                .roomId(this.roomFurniture.getRoom().getId())
+                .groupId(this.group.getId())
+                .name(this.name)
+                .isAcceptNoti(this.isAcceptNoti)
+                .startDate(this.startDate)
+                .lastDate(this.lastDate)
+                .repetition(this.repetition)
+                .notiTime(this.notiTime)
+                .build();
+    }
+
+    public void updateInfo(ChoreDto.Update choreUpdateReqDto) {
+        if (choreUpdateReqDto.getName() != null) this.name = choreUpdateReqDto.getName();
+        if (choreUpdateReqDto.getIsAcceptNoti() != null) this.isAcceptNoti = choreUpdateReqDto.getIsAcceptNoti();
+        if (choreUpdateReqDto.getStartDate() != null) this.startDate = choreUpdateReqDto.getStartDate();
+        if (choreUpdateReqDto.getLastDate() != null) this.lastDate = choreUpdateReqDto.getLastDate();
+        if (choreUpdateReqDto.getRepetition() != null) this.repetition = choreUpdateReqDto.getRepetition();
+        if (choreUpdateReqDto.getNotiTime() != null) this.notiTime = choreUpdateReqDto.getNotiTime();
+        if (choreUpdateReqDto.getIsAcceptNoti()==false) this.notiTime = null;
+    }
+
+    public void updateUser(User newUser) {
+        this.user = newUser;
+    }
+
+    public void updateRoomFurniture(RoomFurniture roomFurniture) {
+        this.roomFurniture = roomFurniture;
+    }
+
+    public void setNotiTime(LocalTime time) {
+        this.notiTime = time;
+    }
+
+
+
 }

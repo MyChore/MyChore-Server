@@ -2,12 +2,13 @@ package com.mychore.mychore_server.entity.chore;
 
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
+import java.time.LocalDate;
+
+@Builder
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ChoreLog extends BaseEntity {
@@ -23,6 +24,14 @@ public class ChoreLog extends BaseEntity {
     private Chore chore;
 
     @NonNull
-    @Column(columnDefinition = "BOOLEAN DEFAULT true")
-    private Boolean isComplete = true;
+    @Column(columnDefinition = "BOOLEAN DEFAULT true", name = "is_complete")
+    private Boolean isComplete;
+
+    @NonNull
+    @Column(name = "set_date")
+    private LocalDate setDate;
+
+    public void updateIsComplete(Boolean bool) {
+        this.isComplete = bool;
+    }
 }

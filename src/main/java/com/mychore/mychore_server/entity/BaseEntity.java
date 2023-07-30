@@ -19,14 +19,14 @@ public class BaseEntity implements Serializable {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updateAt;
+    private LocalDateTime updateAt = LocalDateTime.now();
 
     @Setter
     @Column(nullable = false, columnDefinition = "varchar(10) default 'active'")
-    private String status;
+    private String status = "active";
 
 }
