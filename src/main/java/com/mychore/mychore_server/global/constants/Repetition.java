@@ -16,7 +16,7 @@ public enum Repetition {
         this.repeatName = repeatName;
     }
 
-    public static Repetition getFloorTypeByName(String name){
+    public static Repetition getByName(String name){
         return Arrays.stream(Repetition.values())
                 .filter(repetition -> repetition.getRepeatName().equals(name))
                 .findAny().orElse(null);
