@@ -4,8 +4,11 @@ import com.mychore.mychore_server.dto.Group.AddFurnitureResDTO;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
+@DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
 public class Furniture extends BaseEntity {

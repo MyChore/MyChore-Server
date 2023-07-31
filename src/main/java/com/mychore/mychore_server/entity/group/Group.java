@@ -3,14 +3,14 @@ package com.mychore.mychore_server.entity.group;
 import com.mychore.mychore_server.global.constants.FloorType;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
+@DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
+@Getter @Setter
 @Table(name = "floor_group")
 public class Group extends BaseEntity {
 

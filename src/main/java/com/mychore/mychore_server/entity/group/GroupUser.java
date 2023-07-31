@@ -8,8 +8,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
+@DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class GroupUser extends BaseEntity {
@@ -25,11 +28,17 @@ public class GroupUser extends BaseEntity {
     private Group group;
 
     @NonNull
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @NonNull
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public GroupUser(Group group, User user, Role role){
+        this.group = group;
+        this.user = user;
+        this.role = role;
+    }
 }
