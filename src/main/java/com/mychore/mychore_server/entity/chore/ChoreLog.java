@@ -3,6 +3,8 @@ package com.mychore.mychore_server.entity.chore;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 
@@ -10,6 +12,8 @@ import java.time.LocalDate;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@DynamicUpdate
 @Getter
 public class ChoreLog extends BaseEntity {
 
@@ -24,11 +28,9 @@ public class ChoreLog extends BaseEntity {
     private Chore chore;
 
     @NonNull
-    @Column(columnDefinition = "BOOLEAN DEFAULT true", name = "is_complete")
     private Boolean isComplete;
 
     @NonNull
-    @Column(name = "set_date")
     private LocalDate setDate;
 
     public void updateIsComplete(Boolean bool) {

@@ -1,6 +1,5 @@
 package com.mychore.mychore_server.service;
 
-import com.mychore.mychore_server.dto.ResponseCustom;
 import com.mychore.mychore_server.dto.chore.ChoreAssembler;
 import com.mychore.mychore_server.dto.chore.request.ChoreCreateReq;
 import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
@@ -11,6 +10,7 @@ import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
+import com.mychore.mychore_server.global.constants.Constant;
 import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class ChoreService {
      * 집안일 생성
      * @return ResponseCustom<String>
      */
-    public ResponseCustom<String> saveChore(ChoreCreateReq choreSaveReqDto) {
+    public String saveChore(ChoreCreateReq choreSaveReqDto) {
 
         choreAssembler.isValidSaveReqBody(choreSaveReqDto);
 
@@ -42,10 +42,9 @@ public class ChoreService {
         RoomFurniture roomFurniture =
                 choreAssembler.findRoomFurnitureEntity(choreSaveReqDto.getRoomFurnitureId());
 
-        Chore newChore = choreAssembler.toEntity(user, roomFurniture, group, choreSaveReqDto);
-        choreRepository.save(newChore);
+        choreRepository.save(choreAssembler.toEntity(user, roomFurniture, group, choreSaveReqDto));
 
-        return ResponseCustom.OK("집안일 생성이 완료되었습니다.");
+        return "집안일 생성이 완료되었습니다.";
     }
 
     /**
@@ -54,8 +53,9 @@ public class ChoreService {
      * @return ChoreSimpleResp
      */
     public ChoreSimpleResp findChore(Long choreId) {
-        return choreAssembler.findChoreEntity(choreId)
-                .toDto();
+
+        return ChoreSimpleResp.toDto(choreAssembler.findChoreEntity(choreId));
+
     }
 
     /**
@@ -76,7 +76,7 @@ public class ChoreService {
      * @param choreUpdateReqDto
      * @return ResponseCustom<String>
      */
-    public ResponseCustom<String> updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto) {
+    public String updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto) {
 
         Chore findChore = choreAssembler.findChoreEntity(choreId);
 
@@ -96,7 +96,7 @@ public class ChoreService {
             }
         }
 
-        return ResponseCustom.OK("집안일 수정이 완료되었습니다.");
+        return "집안일 수정이 완료되었습니다.";
     }
 
 
@@ -107,17 +107,14 @@ public class ChoreService {
      * @param bool
      * @return ResponseCustom<String>
      */
-    public ResponseCustom<String> setChoreLog(Long choreId, LocalDate setDate, Boolean bool) {
+    public String setChoreLog(Long choreId, LocalDate setDate, Boolean bool) {
 
         Chore findChore = choreAssembler.findChoreEntity(choreId);
 
-        choreAssembler.isValidSetLogReqParameter(findChore, setDate, bool);
-
-        LocalDate fromTime = setDate;
-        LocalDate toTime = setDate;
+        choreAssembler.isValidSetLogReqParameter(findChore, setDate);
 
         ChoreLog findChoreLog =
-                choreLogRepository.findChoreLogByChoreAndSetDateBetween(findChore, fromTime, toTime);
+                choreLogRepository.findChoreLogByChoreAndSetDateBetween(findChore, setDate, setDate);
 
         if (findChoreLog == null) {
             ChoreLog newChoreLog = ChoreLog.builder()
@@ -126,11 +123,13 @@ public class ChoreService {
                     .isComplete(bool)
                     .build();
             choreLogRepository.save(newChoreLog);
+            return "집안일을 완료했습니다.";
         } else {
             findChoreLog.updateIsComplete(bool);
+            return "집안일 완료 상태가 수정되었습니다.";
         }
 
-        return ResponseCustom.OK("집안일 완료 상태가 수정이 완료되었습니다.");
+
     }
 
     /**
@@ -138,15 +137,11 @@ public class ChoreService {
      * @param choreId
      * @return
      */
-    public ResponseCustom<String> deleteChore(Long choreId) {
+    public String deleteChore(Long choreId) {
 
-        Chore findChore = choreAssembler.findChoreEntity(choreId);
+        choreAssembler.findChoreEntity(choreId).setStatus(Constant.INACTIVE_STATUS);
 
-        // 집안일 삭제전 해당 집안일과 연결된 log 삭제
-        choreLogRepository.deleteAll(choreLogRepository.findChoreLogsByChore(findChore));
-
-        choreRepository.delete(findChore);
-        return ResponseCustom.OK("집안일 삭제가 완료되었습니다.");
+        return "집안일이 삭제 상태로 변경되었습니다.";
     }
 
 

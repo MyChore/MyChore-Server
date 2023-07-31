@@ -3,6 +3,7 @@ package com.mychore.mychore_server.repository;
 import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
+import com.mychore.mychore_server.global.constants.Constant;
 import com.mychore.mychore_server.global.constants.Repetition;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -24,7 +25,6 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
     @Override
     public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId, LocalDate fromTime, LocalDate toTime) {
 
-        // 집안일 필터링해서 가져오기
         String query = "select c " +
                 "from Chore c " +
                 "join fetch c.user u " +
@@ -32,6 +32,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
                 "join fetch c.roomFurniture rf " +
                 "left join fetch c.choreLogList cl " +
                 "where g.id = :groupId " +
+                "and c.status = :status " +
                 "and c.lastDate > :fromTime ";
 
         if (userId != null) {
@@ -43,7 +44,8 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
 
         TypedQuery<Chore> choreTypedQuery = em.createQuery(query, Chore.class)
                 .setParameter("groupId", groupId)
-                .setParameter("fromTime", fromTime);
+                .setParameter("fromTime", fromTime)
+                .setParameter("status", Constant.ACTIVE_STATUS);
 
         if (userId != null) {
             choreTypedQuery.setParameter("userId", userId);
@@ -82,7 +84,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
 
                 LocalDate currentDate = startDate;
 
-                if (fromTime.isBefore(startDate)) {
+                if (startDate.isBefore(fromTime)) {
                     currentDate = fromTime;
                 }
 
@@ -135,7 +137,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
         return null;
     }
 
-    // 새로운 ChoreDto.Response 객체를 생성하고 ChoreResponse 정보에 setDate, setCompleteStatus 설정하여 반환하는 함수
+    // 새로운 ChoreDto.Response 객체를 생성해 setDate, setCompleteStatus 설정하는 함수
     private ChoreDetailResp createChoreDtoResponse(Chore choreResponse, List<ChoreLog> choreLogList, LocalDate currentDate) {
         ChoreDetailResp newResp = new ChoreDetailResp(choreResponse);
         newResp.setSetDate(currentDate);

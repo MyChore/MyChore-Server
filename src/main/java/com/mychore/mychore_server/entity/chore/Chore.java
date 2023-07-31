@@ -1,7 +1,6 @@
 package com.mychore.mychore_server.entity.chore;
 
 import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
-import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
 import com.mychore.mychore_server.global.constants.Repetition;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.group.Group;
@@ -10,7 +9,8 @@ import com.mychore.mychore_server.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder;
-
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,6 +21,8 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@DynamicUpdate
 @Getter
 public class Chore extends BaseEntity {
     @Id
@@ -53,10 +55,7 @@ public class Chore extends BaseEntity {
 
     @NonNull
     private LocalDate startDate;
-
     private LocalDate lastDate;
-
-    @Column(name = "noti_time")
     private LocalTime notiTime;
 
     @Enumerated(EnumType.STRING)
@@ -65,22 +64,6 @@ public class Chore extends BaseEntity {
     @OneToMany(mappedBy = "chore")
     private List<ChoreLog> choreLogList = new ArrayList<>();
 
-    public ChoreSimpleResp toDto() {
-        return ChoreSimpleResp.builder()
-                .id(this.id)
-                .userId(this.user.getId())
-                .roomFurnitureId(this.roomFurniture.getId())
-                .roomId(this.roomFurniture.getRoom().getId())
-                .groupId(this.group.getId())
-                .name(this.name)
-                .isAcceptNoti(this.isAcceptNoti)
-                .startDate(this.startDate)
-                .lastDate(this.lastDate)
-                .repetition(this.repetition)
-                .notiTime(this.notiTime)
-                .build();
-    }
-
     public void updateInfo(ChoreUpdateReq choreUpdateReqDto) {
         if (choreUpdateReqDto.getName() != null) this.name = choreUpdateReqDto.getName();
         if (choreUpdateReqDto.getIsAcceptNoti() != null) this.isAcceptNoti = choreUpdateReqDto.getIsAcceptNoti();
@@ -88,7 +71,7 @@ public class Chore extends BaseEntity {
         if (choreUpdateReqDto.getLastDate() != null) this.lastDate = choreUpdateReqDto.getLastDate();
         if (choreUpdateReqDto.getRepetition() != null) this.repetition = choreUpdateReqDto.getRepetition();
         if (choreUpdateReqDto.getNotiTime() != null) this.notiTime = choreUpdateReqDto.getNotiTime();
-        if (choreUpdateReqDto.getIsAcceptNoti()==false) this.notiTime = null;
+        if (choreUpdateReqDto.getIsAcceptNoti()!=null && !choreUpdateReqDto.getIsAcceptNoti()) this.notiTime = null;
     }
 
     public void updateUser(User newUser) {

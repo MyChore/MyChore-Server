@@ -1,10 +1,8 @@
 package com.mychore.mychore_server.dto.chore.request;
 
-import com.mychore.mychore_server.entity.chore.Chore;
-import com.mychore.mychore_server.entity.group.Group;
-import com.mychore.mychore_server.entity.group.RoomFurniture;
-import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.Repetition;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,29 +15,24 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class ChoreCreateReq {
 
+    @NotNull(message = "담당자를 입력해주세요.")
     private Long userId;
+
+    @NotNull(message = "가구를 입력해주세요.")
     private Long roomFurnitureId;
+
+    @NotNull(message = "그룹을 입력해주세요.")
     private Long groupId;
 
+    @NotBlank(message = "집안일 이름을 입력해주세요.")
     private String name;
-    private Boolean isAcceptNoti;
+
+    @NotNull(message = "시작날짜을 입력해주세요.")
     private LocalDate startDate;
+
     private LocalDate lastDate;
     private Repetition repetition;
+    private Boolean isAcceptNoti;
     private LocalTime notiTime;
 
-//    public Chore toEntity(User user, RoomFurniture roomFurniture, Group group) {
-//
-//        return Chore.builder()
-//                .user(user)
-//                .roomFurniture(roomFurniture)
-//                .group(group)
-//                .name(this.name)
-//                .isAcceptNoti(this.isAcceptNoti==null ? true : this.isAcceptNoti)
-//                .startDate(this.startDate)
-//                .lastDate(this.repetition==null? this.startDate : this.lastDate)
-//                .repetition(this.repetition)
-//                .notiTime(this.isAcceptNoti==true ? this.notiTime : null)
-//                .build();
-//    }
 }

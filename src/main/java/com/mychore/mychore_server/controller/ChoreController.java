@@ -6,6 +6,7 @@ import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
 import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
 import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
 import com.mychore.mychore_server.service.ChoreService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +27,9 @@ public class ChoreController {
      */
     @PostMapping
     public ResponseCustom<String> saveChoreAPI(
-            @RequestBody ChoreCreateReq choreSaveReqDto) {
+            @RequestBody @Valid ChoreCreateReq choreSaveReqDto) {
 
-        return choreService.saveChore(choreSaveReqDto);
+        return ResponseCustom.OK(choreService.saveChore(choreSaveReqDto));
     }
 
 
@@ -43,15 +44,12 @@ public class ChoreController {
      */
     @GetMapping
     public ResponseCustom<List<ChoreDetailResp>> getChoresAPI(
-            @RequestParam Long userId,
+            @RequestParam(required = false) Long userId,
             @RequestParam Long groupId,
             @RequestParam(required = false) Long roomId,
             @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
 
-        List<ChoreDetailResp> chores =
-                choreService.findChores(userId, groupId, roomId, fromDate, toDate);
-
-        return ResponseCustom.OK(chores);
+        return ResponseCustom.OK(choreService.findChores(userId, groupId, roomId, fromDate, toDate));
     }
 
 
@@ -64,8 +62,7 @@ public class ChoreController {
     public ResponseCustom<ChoreSimpleResp> getChoreAPI(
             @PathVariable Long choreId) {
 
-        ChoreSimpleResp chore = choreService.findChore(choreId);
-        return ResponseCustom.OK(chore);
+        return ResponseCustom.OK(choreService.findChore(choreId));
     }
 
 
@@ -82,7 +79,7 @@ public class ChoreController {
             @RequestParam LocalDate setTime,
             @RequestParam Boolean status) {
 
-        return choreService.setChoreLog(choreId, setTime, status);
+        return ResponseCustom.OK(choreService.setChoreLog(choreId, setTime, status));
     }
 
 
@@ -97,7 +94,7 @@ public class ChoreController {
             @PathVariable Long choreId,
             @RequestBody ChoreUpdateReq choreUpdateReqDto) {
 
-        return choreService.updateChore(choreId, choreUpdateReqDto);
+        return ResponseCustom.OK(choreService.updateChore(choreId, choreUpdateReqDto));
     }
 
     /**
@@ -109,11 +106,7 @@ public class ChoreController {
     public ResponseCustom<String> deleteChoreAPI(
             @PathVariable Long choreId) {
 
-        return choreService.deleteChore(choreId);
+        return ResponseCustom.OK(choreService.deleteChore(choreId));
     }
-
-
-
-
 
 }

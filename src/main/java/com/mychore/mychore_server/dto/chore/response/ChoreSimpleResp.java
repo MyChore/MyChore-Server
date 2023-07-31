@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.dto.chore.response;
 
+import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.global.constants.Repetition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,22 @@ public class ChoreSimpleResp {
     private LocalDate lastDate;
     private Repetition repetition;
     private LocalTime notiTime;
+
+    public static ChoreSimpleResp toDto(Chore chore) {
+        return ChoreSimpleResp.builder()
+                .id(chore.getId())
+                .userId(chore.getId())
+                .roomFurnitureId(chore.getRoomFurniture().getId())
+                .roomId(chore.getRoomFurniture().getRoom().getId())
+                .groupId(chore.getGroup().getId())
+                .name(chore.getName())
+                .isAcceptNoti(chore.getIsAcceptNoti())
+                .startDate(chore.getStartDate())
+                .lastDate(chore.getLastDate())
+                .repetition(chore.getRepetition())
+                .notiTime(chore.getNotiTime())
+                .build();
+    }
 
 
 }

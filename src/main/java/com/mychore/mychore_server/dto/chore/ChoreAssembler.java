@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
+
 @Component
 @RequiredArgsConstructor
 public class ChoreAssembler {
@@ -44,34 +46,32 @@ public class ChoreAssembler {
 
     // 엔티티 검증 로직
     public User findUserEntity(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException());
+        return userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public Room findRoomEntity(Long roomId) {
-        return roomRepository.findById(roomId)
+        return roomRepository.findRoomByIdAndStatus(roomId, ACTIVE_STATUS)
                 .orElseThrow(() -> new ExpressionException("요청한 idx를 가진 방을 찾을 수 없습니다."));
     }
 
     public RoomFurniture findRoomFurnitureEntity(Long roomFurnitureId) {
-        return roomFurnitureRepository.findById(roomFurnitureId)
+        return roomFurnitureRepository.findRoomFurnitureByIdAndStatus(roomFurnitureId, ACTIVE_STATUS)
                 .orElseThrow(() -> new ExpressionException("요청한 idx를 가진 가구를 찾을 수 없습니다."));
     }
 
     public Group findGroupEntity(Long groupId) {
-        return groupRepository.findById(groupId)
+        return groupRepository.findGroupByIdAndStatus(groupId, ACTIVE_STATUS)
                 .orElseThrow(() -> new ExpressionException("요청한 idx를 가진 그룹을 찾을 수 없습니다."));
     }
 
     public Chore findChoreEntity(Long choreId) {
-        return choreRepository.findById(choreId)
+        return choreRepository.findChoreByIdAndStatus(choreId, ACTIVE_STATUS)
                 .orElseThrow(() -> new ChoreNotFoundException(choreId));
     }
 
     // findChores 검증 로직
     public Void isValidfindChoresParameter(Long userId, Long groupId, Long roomId, LocalDate fromTime, LocalDate toTime) {
-
-        String result = "";
 
         if (userId!=null) {
             findUserEntity(userId);
@@ -85,26 +85,8 @@ public class ChoreAssembler {
             findRoomEntity(roomId);
         }
 
-        if (groupId==null) {
-            result += (result=="") ? "그룹" : ", 그룹";
-        }
-
-        if (fromTime==null) {
-            result += (result=="") ? "조회시작날짜" : ", 조회시작날짜";
-        }
-
-        if (toTime==null) {
-            result += (result=="") ? "조회종료날짜" : ", 조회종료날짜";
-        }
-
-        if (fromTime!=null && toTime!=null) {
-            if (fromTime.isAfter(toTime)) {
-                result += (result=="") ? "조회구간" : ", 조회구간";
-            }
-        }
-
-        if (result!="") {
-            throw new ChoreBadRequestException(result);
+        if (fromTime.isAfter(toTime)) {
+            new ChoreBadRequestException("조회구간");
         }
 
         return null;
@@ -142,27 +124,12 @@ public class ChoreAssembler {
 
 
     //  setChoreLog 파라미터 확인하는 함수
-    public Void isValidSetLogReqParameter(Chore chore, LocalDate setDate, Boolean bool) {
-        String result = "";
+    public Void isValidSetLogReqParameter(Chore chore, LocalDate setDate) {
 
-        if (setDate == null ) {
-            result += (result=="") ? "설정시간" : ", 설정시간";
+        if (setDate.isBefore(chore.getStartDate()) || setDate.isAfter(chore.getLastDate())) {
+            throw new ChoreBadRequestException("설정시간");
         }
 
-        if (setDate != null) {
-            if (setDate.isBefore(chore.getStartDate()) ||
-                    setDate.isAfter(chore.getLastDate())) {
-                result += (result=="") ? "설정시간" : ", 설정시간";
-            }
-        }
-
-        if (bool.equals(null)) {
-            result += (result=="") ? "완료상태" : ", 완료상태";
-        }
-
-        if (result!="") {
-            throw new ChoreBadRequestException(result);
-        }
 
         return null;
     }
@@ -171,26 +138,6 @@ public class ChoreAssembler {
     public Void isValidSaveReqBody(ChoreCreateReq choreSaveReqDto) {
 
         String result = "";
-
-        if (choreSaveReqDto.getName()=="" || choreSaveReqDto.getName()==null) {
-            result += (result=="") ? "이름" : ", 이름";
-        }
-
-        if (choreSaveReqDto.getUserId()==null) {
-            result += (result=="") ? "담당자" : ", 담당자";
-        }
-
-        if (choreSaveReqDto.getRoomFurnitureId()==null) {
-            result += (result=="") ? "가구" : ", 가구";
-        }
-
-        if (choreSaveReqDto.getGroupId()==null) {
-            result += (result=="") ? "그룹" : ", 그룹";
-        }
-
-        if (choreSaveReqDto.getStartDate()==null) {
-            result += (result=="") ? "시작날짜" : ", 시작날짜";
-        }
 
         if (choreSaveReqDto.getStartDate()!=null && choreSaveReqDto.getLastDate()!=null) {
             if (choreSaveReqDto.getStartDate().isAfter(choreSaveReqDto.getLastDate())) {
