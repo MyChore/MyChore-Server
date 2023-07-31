@@ -1,8 +1,9 @@
 package com.mychore.mychore_server.service;
 
-import com.mychore.mychore_server.dto.Group.AddFurnitureResDTO;
-import com.mychore.mychore_server.dto.Group.PostGroupReqDTO;
-import com.mychore.mychore_server.dto.Group.PostGroupResDTO;
+import com.mychore.mychore_server.dto.Group.Res.AddFurnitureResDTO;
+import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
+import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
+import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
 import com.mychore.mychore_server.dto.Group.RoomInfoDTO;
 import com.mychore.mychore_server.dto.ResponseCustom;
 import com.mychore.mychore_server.entity.group.Furniture;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static com.mychore.mychore_server.global.constants.Role.MEMBER;
 import static com.mychore.mychore_server.global.constants.Role.OWNER;
 
 @Service
@@ -30,16 +32,16 @@ public class GroupService {
     public final UserRepository userRepository;
     public final GroupUserRepository groupUserRepository;
 
-    public String addFurniture(AddFurnitureResDTO reqDTO){
+    public ResponseCustom<Furniture> addFurniture(AddFurnitureResDTO reqDTO){
         Furniture furniture = new Furniture(reqDTO);
-        furnitureRepository.save(furniture);
-        return furniture.getName();
+        Furniture res = furnitureRepository.save(furniture);
+        return ResponseCustom.OK(res);
     }
 
     public ResponseCustom<PostGroupResDTO> postGroup(PostGroupReqDTO reqDTO, Long userId){
         String inviteCode = createInviteCode();
         Group group = new Group(
-                reqDTO.getFloorName(), inviteCode, reqDTO.getFloorType());
+                inviteCode, reqDTO.getFloorName(), reqDTO.getFloorType());
         Long groupId = groupRepository.save(group).getId();
         group.setId(groupId);
 
@@ -69,5 +71,30 @@ public class GroupService {
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
+    }
+
+    public ResponseCustom<Long> joinGroup(String inviteCode, Long userId){
+        Optional<Group> group = groupRepository.findByInviteCode(inviteCode);
+        if(group.isPresent()){
+            Optional<User> user = userRepository.findById(userId);
+
+            Optional<GroupUser> groupUser_check = groupUserRepository.findByUserAndGroup(user.get(), group.get());
+            if(groupUser_check.isPresent()){
+                return ResponseCustom.BAD_REQUEST("이미 그룹에 참여하고 있습니다.");
+            }
+            GroupUser groupUser = new GroupUser(group.get(), user.get(), MEMBER);
+            groupUserRepository.save(groupUser);
+
+            return ResponseCustom.OK(group.get().getId());
+        }
+        return ResponseCustom.BAD_REQUEST("유효하지 않은 초대코드 입니다.");
+    }
+
+    public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(){
+        List<FurnitureResDTO> resDTO = new ArrayList<>();
+        for(Furniture furniture : furnitureRepository.findAll()){
+            resDTO.add(new FurnitureResDTO(furniture));
+        }
+        return ResponseCustom.OK(resDTO);
     }
 }

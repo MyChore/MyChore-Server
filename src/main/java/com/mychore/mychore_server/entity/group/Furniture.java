@@ -1,7 +1,8 @@
 package com.mychore.mychore_server.entity.group;
 
-import com.mychore.mychore_server.dto.Group.AddFurnitureResDTO;
+import com.mychore.mychore_server.dto.Group.Res.AddFurnitureResDTO;
 import com.mychore.mychore_server.entity.BaseEntity;
+import com.mychore.mychore_server.global.constants.FurnitureType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -32,10 +33,15 @@ public class Furniture extends BaseEntity {
 
     private String imgKey;
 
+    @NonNull
+    @Enumerated(EnumType.STRING)
+    private FurnitureType furnitureType;
+
     @Builder
     public Furniture(AddFurnitureResDTO reqDTO){
         this.name = reqDTO.getName();
         this.sizeX = reqDTO.getSizeX();
         this.sizeY = reqDTO.getSizeY();
+        this.furnitureType = reqDTO.getFurnitureType();
     }
 }

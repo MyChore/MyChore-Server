@@ -1,4 +1,4 @@
-package com.mychore.mychore_server.dto.Group;
+package com.mychore.mychore_server.dto.Group.Res;
 
 import lombok.Getter;
 import lombok.Setter;

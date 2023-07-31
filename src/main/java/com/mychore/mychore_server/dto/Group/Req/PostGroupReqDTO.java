@@ -1,5 +1,6 @@
-package com.mychore.mychore_server.dto.Group;
+package com.mychore.mychore_server.dto.Group.Req;
 
+import com.mychore.mychore_server.dto.Group.RoomInfoDTO;
 import com.mychore.mychore_server.global.constants.FloorType;
 import lombok.Getter;
 
