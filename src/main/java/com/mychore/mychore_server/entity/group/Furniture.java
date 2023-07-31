@@ -1,15 +1,13 @@
 package com.mychore.mychore_server.entity.group;
 
+import com.mychore.mychore_server.dto.Group.AddFurnitureResDTO;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
+@Getter @Setter
 public class Furniture extends BaseEntity {
 
     @Id
@@ -30,4 +28,11 @@ public class Furniture extends BaseEntity {
     private String name;
 
     private String imgKey;
+
+    @Builder
+    public Furniture(AddFurnitureResDTO reqDTO){
+        this.name = reqDTO.getName();
+        this.sizeX = reqDTO.getSizeX();
+        this.sizeY = reqDTO.getSizeY();
+    }
 }

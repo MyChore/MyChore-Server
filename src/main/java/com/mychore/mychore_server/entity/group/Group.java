@@ -30,4 +30,10 @@ public class Group extends BaseEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     private FloorType floorType;
+
+    public Group(String inviteCode, String name, FloorType floorType){
+        this.inviteCode = inviteCode;
+        this.name = name;
+        this.floorType = floorType;
+    }
 }

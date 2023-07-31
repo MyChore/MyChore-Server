@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.group;
 
+import com.mychore.mychore_server.dto.Group.RoomInfoDTO;
 import com.mychore.mychore_server.global.constants.RoomType;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -46,4 +47,14 @@ public class Room extends BaseEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
+
+    public Room(Group group, RoomInfoDTO roomInfoDTO){
+        this.group = group;
+        this.sizeX = roomInfoDTO.getSizeX();
+        this.sizeY = roomInfoDTO.getSizeY();
+        this.locationX = roomInfoDTO.getLocationX();
+        this.locationY = roomInfoDTO.getLocationY();
+        this.roomType = roomInfoDTO.getRoomType();
+        this.name = roomInfoDTO.getName();
+    }
 }
