@@ -19,13 +19,13 @@ public enum FloorType {
         this.typeName = typeName;
     }
 
-    public static FloorType getFloorTypeByName(String name){
+    public static FloorType getByName(String name){
         return Arrays.stream(FloorType.values())
                 .filter(floorType -> floorType.getTypeName().equals(name))
                 .findAny().orElse(null);
     }
 
-    public static FloorType getFloorTypeByNum(Double num){
+    public static FloorType getByNum(Double num){
         return Arrays.stream(FloorType.values())
                 .filter(floorType -> floorType.getTypeNum() == num)
                 .findAny().orElse(null);

@@ -1,17 +1,20 @@
 package com.mychore.mychore_server.entity.user;
 
+import com.mychore.mychore_server.dto.user.request.PatchProfileReq;
+import com.mychore.mychore_server.global.constants.Gender;
 import com.mychore.mychore_server.global.constants.Provider;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@DynamicUpdate
 @Getter
 public class User extends BaseEntity {
 
@@ -28,8 +31,8 @@ public class User extends BaseEntity {
     @Column(length = 10)
     private String nickname;
 
-    @Column(length = 10)
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     private LocalDate birth;
 
@@ -38,4 +41,37 @@ public class User extends BaseEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     private Provider provider;
+
+    private String refreshToken;
+
+    @Builder
+    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgKey, @NonNull Provider provider) {
+        this.email = email;
+        this.nickname = nickname;
+        this.gender = gender;
+        this.birth = birth;
+        this.imgKey = imgKey;
+        this.provider = provider;
+    }
+
+    public void editProfile(PatchProfileReq patchProfileReq){
+        editNickname(patchProfileReq.getNickname());
+        editBirth(patchProfileReq.getBirth());
+        editGender(patchProfileReq.getGender());
+    }
+    public void editGender(String gender) {
+        this.gender = Gender.getByName(gender);
+    }
+    public void editBirth(String date) {
+        this.birth = LocalDate.parse(date);
+    }
+    public void editNickname(String nickname) {
+        this.nickname = nickname;
+    }
+    public void editImgKey(String imgKey) {
+        this.imgKey = imgKey;
+    }
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
 }
