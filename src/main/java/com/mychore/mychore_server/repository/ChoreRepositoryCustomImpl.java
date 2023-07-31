@@ -33,7 +33,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
                 "left join fetch c.choreLogList cl " +
                 "where g.id = :groupId " +
                 "and c.status = :status " +
-                "and c.lastDate > :fromTime ";
+                "and (c.lastDate is null or c.lastDate > :fromTime) ";
 
         if (userId != null) {
             query += "and u.id = :userId ";
@@ -88,7 +88,10 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
                     currentDate = fromTime;
                 }
 
-                while (currentDate.isBefore(toTime.plusDays(1)) && currentDate.isBefore(lastDate.plusDays(1))) {
+
+                while (lastDate==null ? currentDate.isBefore(toTime.plusDays(1)) :
+                        currentDate.isBefore(toTime.plusDays(1)) && currentDate.isBefore(lastDate.plusDays(1))
+                ) {
                     if (currentDate.isAfter(fromTime) || currentDate.isEqual(fromTime)) {
                         choreLists.add(createChoreDtoResponse(choreResponse, choreLogList, currentDate));
                     }
@@ -104,6 +107,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
                             currentDate = currentDate.plusMonths(1);
                             break;
                     }
+
                 }
             }
         }
