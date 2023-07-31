@@ -20,11 +20,6 @@ public class ChoreController {
 
     private final ChoreService choreService;
 
-    /**
-     * 집안일 생성(저장) API
-     * @param choreSaveReqDto
-     * @return
-     */
     @PostMapping
     public ResponseCustom<String> saveChoreAPI(
             @RequestBody @Valid ChoreCreateReq choreSaveReqDto) {
@@ -32,16 +27,6 @@ public class ChoreController {
         return ResponseCustom.OK(choreService.saveChore(choreSaveReqDto));
     }
 
-
-    /**
-     * 집안일 다건조회 API
-     * @param userId
-     * @param groupId
-     * @param roomId
-     * @param fromDate
-     * @param toDate
-     * @return
-     */
     @GetMapping
     public ResponseCustom<List<ChoreDetailResp>> getChoresAPI(
             @RequestParam(required = false) Long userId,
@@ -52,12 +37,6 @@ public class ChoreController {
         return ResponseCustom.OK(choreService.findChores(userId, groupId, roomId, fromDate, toDate));
     }
 
-
-    /**
-     * 집안일 단건조회 API
-     * @param choreId
-     * @return
-     */
     @GetMapping("/{choreId}")
     public ResponseCustom<ChoreSimpleResp> getChoreAPI(
             @PathVariable Long choreId) {
@@ -65,14 +44,6 @@ public class ChoreController {
         return ResponseCustom.OK(choreService.findChore(choreId));
     }
 
-
-    /**
-     * 집안일 완료 상태 수정 API
-     * @param choreId
-     * @param setTime
-     * @param status
-     * @return
-     */
     @PostMapping("/{choreId}/log")
     public ResponseCustom<String> setChoreLogStatusAPI(
             @PathVariable Long choreId,
@@ -82,13 +53,6 @@ public class ChoreController {
         return ResponseCustom.OK(choreService.setChoreLog(choreId, setTime, status));
     }
 
-
-    /**
-     * 집안일 수정 API
-     * @param choreId
-     * @param choreUpdateReqDto
-     * @return
-     */
     @PatchMapping("/{choreId}")
     public ResponseCustom<String> updateChoreAPI(
             @PathVariable Long choreId,
@@ -97,11 +61,6 @@ public class ChoreController {
         return ResponseCustom.OK(choreService.updateChore(choreId, choreUpdateReqDto));
     }
 
-    /**
-     * 집안일 삭제 API
-     * @param choreId
-     * @return
-     */
     @DeleteMapping("/{choreId}")
     public ResponseCustom<String> deleteChoreAPI(
             @PathVariable Long choreId) {

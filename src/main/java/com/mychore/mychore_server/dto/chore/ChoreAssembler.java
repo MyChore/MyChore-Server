@@ -40,7 +40,7 @@ public class ChoreAssembler {
                 .startDate(choreCreateReq.getStartDate())
                 .lastDate(choreCreateReq.getRepetition()==null? choreCreateReq.getStartDate() : choreCreateReq.getLastDate())
                 .repetition(choreCreateReq.getRepetition())
-                .notiTime(choreCreateReq.getIsAcceptNoti()==true ? choreCreateReq.getNotiTime() : null)
+                .notiTime(choreCreateReq.getIsAcceptNoti() ? choreCreateReq.getNotiTime() : null)
                 .build();
     }
 
@@ -98,7 +98,7 @@ public class ChoreAssembler {
         String result = "";
 
         if (choreUpdateReqDto.getIsAcceptNoti()!=null) {
-            if (choreUpdateReqDto.getIsAcceptNoti()==true && choreUpdateReqDto.getNotiTime()==null) {
+            if (choreUpdateReqDto.getIsAcceptNoti() && choreUpdateReqDto.getNotiTime()==null) {
                 result += (result=="") ? "알림시간" : ", 알림시간";
             }
         }
@@ -139,13 +139,13 @@ public class ChoreAssembler {
 
         String result = "";
 
-        if (choreSaveReqDto.getStartDate()!=null && choreSaveReqDto.getLastDate()!=null) {
+        if (choreSaveReqDto.getLastDate()!=null) {
             if (choreSaveReqDto.getStartDate().isAfter(choreSaveReqDto.getLastDate())) {
                 result += (result=="") ? "종료날짜" : ", 종료날짜";
             }
         }
 
-        if (choreSaveReqDto.getIsAcceptNoti()!=null&&choreSaveReqDto.getIsAcceptNoti()==true) {
+        if (choreSaveReqDto.getIsAcceptNoti()!=null&&choreSaveReqDto.getIsAcceptNoti()) {
             if (choreSaveReqDto.getNotiTime()==null) {
                 result += (result=="") ? "알림시간" : ", 알림시간";
             }

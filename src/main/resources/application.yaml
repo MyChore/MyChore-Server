@@ -4,9 +4,6 @@ spring:
     url: ENC(HkT6MzsagA1pP9RKYeZbMQMLx0tzhisPVCfydP4Ga3H8hB65Pk19qEDdpAyG+IEDT8Ofcxsstzk+alQc2gmsJ7OyPf+d9bkpcO6vYtmLJ+FpVS/NzNSGBd5bule8sOeQYhqkvcriSTg=)
     username: ENC(j2POHa0PIgunJ31+DDuP2Q==)
     password: ENC(9jqSM+xZZcDZpahr6sbRd1cA3ZAF7f4Z)
-#    url: jdbc:mysql://localhost:3306/mychore_dev?serverTimezone=UTC&characterEncoding=UTF-8
-#    username: root
-#    password: 897100
 
   sql:
     init:
@@ -29,4 +26,3 @@ spring:
 
   profiles:
     include: secret
-#    include: local

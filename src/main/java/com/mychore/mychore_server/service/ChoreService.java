@@ -29,10 +29,6 @@ public class ChoreService {
 
     private final ChoreAssembler choreAssembler;
 
-    /**
-     * 집안일 생성
-     * @return ResponseCustom<String>
-     */
     public String saveChore(ChoreCreateReq choreSaveReqDto) {
 
         choreAssembler.isValidSaveReqBody(choreSaveReqDto);
@@ -47,21 +43,12 @@ public class ChoreService {
         return "집안일 생성이 완료되었습니다.";
     }
 
-    /**
-     * id를 통한 집안일 단건 조회
-     * @param choreId
-     * @return ChoreSimpleResp
-     */
     public ChoreSimpleResp findChore(Long choreId) {
 
         return ChoreSimpleResp.toDto(choreAssembler.findChoreEntity(choreId));
 
     }
 
-    /**
-     * parameter를 통한 집안일 다건 조회
-     * @return List<ChoreDetailResp>
-     */
     public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId,
                                             LocalDate fromTime, LocalDate toTime) {
 
@@ -70,12 +57,6 @@ public class ChoreService {
         return choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
     }
 
-    /**
-     * 집안일 정보 수정
-     * @param choreId
-     * @param choreUpdateReqDto
-     * @return ResponseCustom<String>
-     */
     public String updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto) {
 
         Chore findChore = choreAssembler.findChoreEntity(choreId);
@@ -99,14 +80,6 @@ public class ChoreService {
         return "집안일 수정이 완료되었습니다.";
     }
 
-
-    /**
-     * 집안일 완료상태 수정
-     * @param choreId
-     * @param setDate
-     * @param bool
-     * @return ResponseCustom<String>
-     */
     public String setChoreLog(Long choreId, LocalDate setDate, Boolean bool) {
 
         Chore findChore = choreAssembler.findChoreEntity(choreId);
@@ -132,11 +105,6 @@ public class ChoreService {
 
     }
 
-    /**
-     * 집안일 삭제
-     * @param choreId
-     * @return
-     */
     public String deleteChore(Long choreId) {
 
         choreAssembler.findChoreEntity(choreId).setStatus(Constant.INACTIVE_STATUS);
