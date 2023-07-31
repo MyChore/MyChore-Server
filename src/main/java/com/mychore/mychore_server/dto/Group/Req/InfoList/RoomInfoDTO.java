@@ -1,4 +1,4 @@
-package com.mychore.mychore_server.dto.Group;
+package com.mychore.mychore_server.dto.Group.Req.InfoList;
 
 import com.mychore.mychore_server.global.constants.RoomType;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.mychore.mychore_server.entity.group;
 
-import com.mychore.mychore_server.dto.Group.RoomInfoDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
 import com.mychore.mychore_server.global.constants.RoomType;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;

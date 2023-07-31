@@ -1,9 +1,11 @@
 package com.mychore.mychore_server.controller;
 
+import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.AddFurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
+import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
 import com.mychore.mychore_server.dto.ResponseCustom;
 import com.mychore.mychore_server.entity.group.Furniture;
 import com.mychore.mychore_server.global.resolver.Auth;
@@ -37,8 +39,13 @@ public class GroupController {
         return groupService.joinGroup(inviteCode, loginStatus.getUserId());
     }
 
-    @GetMapping("/furniture")
+    @GetMapping("/furniture/list")
     public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(){
         return groupService.getFurnitureList();
+    }
+
+    @PostMapping("/furniture")
+    public ResponseCustom<PostRoomResDTO> postRoomDetail(@RequestBody PostRoomReqDTO reqDTO){
+        return groupService.postRoomDetail(reqDTO);
     }
 }

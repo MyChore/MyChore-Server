@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.group;
 
+import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,4 +41,12 @@ public class RoomFurniture extends BaseEntity {
 
     @NonNull
     private Integer rotation;
+
+    public RoomFurniture(Room room, Furniture furniture, FurnitureInfoDTO infoDTO){
+        this.room = room;
+        this.furniture = furniture;
+        this.locationX = infoDTO.getLocationX();
+        this.locationY = infoDTO.getLocationY();
+        this.rotation = infoDTO.getRotation();
+    }
 }

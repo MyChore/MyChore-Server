@@ -1,15 +1,16 @@
 package com.mychore.mychore_server.service;
 
+import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
+import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.AddFurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
-import com.mychore.mychore_server.dto.Group.RoomInfoDTO;
+import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomFurnitureInfoDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
 import com.mychore.mychore_server.dto.ResponseCustom;
-import com.mychore.mychore_server.entity.group.Furniture;
-import com.mychore.mychore_server.entity.group.Group;
-import com.mychore.mychore_server.entity.group.GroupUser;
-import com.mychore.mychore_server.entity.group.Room;
+import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class GroupService {
     public final RoomRepository roomRepository;
     public final UserRepository userRepository;
     public final GroupUserRepository groupUserRepository;
+    public final RoomFurnitureRepository roomFurnitureRepository;
 
     public ResponseCustom<Furniture> addFurniture(AddFurnitureResDTO reqDTO){
         Furniture furniture = new Furniture(reqDTO);
@@ -94,6 +96,20 @@ public class GroupService {
         List<FurnitureResDTO> resDTO = new ArrayList<>();
         for(Furniture furniture : furnitureRepository.findAll()){
             resDTO.add(new FurnitureResDTO(furniture));
+        }
+        return ResponseCustom.OK(resDTO);
+    }
+
+    public ResponseCustom<PostRoomResDTO> postRoomDetail(PostRoomReqDTO reqDTO){
+        Group group = groupRepository.findById(reqDTO.getGroupId()).get();
+        PostRoomResDTO resDTO = new PostRoomResDTO(group.getName(), group.getInviteCode());
+
+        for(RoomFurnitureInfoDTO roomInfo : reqDTO.getRoomFurnitureInfoList()){
+            Room room = roomRepository.findById(roomInfo.getRoomId()).get();
+            for(FurnitureInfoDTO furnInfo : roomInfo.getFurnitureInfoList()){
+                Furniture furniture = furnitureRepository.findById(furnInfo.getFurnitureId()).get();
+                roomFurnitureRepository.save(new RoomFurniture(room, furniture, furnInfo));
+            }
         }
         return ResponseCustom.OK(resDTO);
     }
