@@ -34,8 +34,8 @@ public class GroupController {
     }
 
     @Auth
-    @PostMapping("/member")
-    public ResponseCustom<Long> joinGroup(@RequestParam String inviteCode, @IsLogin LoginStatus loginStatus){
+    @PostMapping("/member/{inviteCode}")
+    public ResponseCustom<Long> joinGroup(@PathVariable("inviteCode") String inviteCode, @IsLogin LoginStatus loginStatus){
         return groupService.joinGroup(inviteCode, loginStatus.getUserId());
     }
 
