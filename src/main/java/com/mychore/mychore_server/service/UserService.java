@@ -49,6 +49,20 @@ public class UserService {
         return UserTokenRes.toDto(jwtUtils.createToken(user));
     }
 
+    // 로그아웃
+    public void logout(Long userId) {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        user.removeTokens();
+        userRepository.save(user);
+    }
+
+    // 회원탈퇴
+    public void withdraw(Long userId) {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        user.withdraw();
+        userRepository.save(user);
+    }
+
     // 프로필 조회
     public GetProfileRes getProfile(Long userId) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
