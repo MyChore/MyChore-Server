@@ -29,7 +29,7 @@ public class ChoreController {
             @RequestBody @Valid ChoreCreateReq choreSaveReqDto,
             @IsLogin LoginStatus loginStatus) {
 
-        choreService.saveChore(choreSaveReqDto, loginStatus);
+        choreService.saveChore(choreSaveReqDto, loginStatus.getUserId());
         return ResponseCustom.OK();
     }
 
@@ -40,9 +40,9 @@ public class ChoreController {
             @RequestParam Long groupId,
             @RequestParam(required = false) Long roomId,
             @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
-            LoginStatus loginStatus) {
+            @IsLogin LoginStatus loginStatus) {
 
-        return ResponseCustom.OK(choreService.findChores(userId, groupId, roomId, fromDate, toDate, loginStatus));
+        return ResponseCustom.OK(choreService.findChores(userId, groupId, roomId, fromDate, toDate, loginStatus.getUserId()));
     }
 
     @Auth
@@ -51,7 +51,7 @@ public class ChoreController {
             @PathVariable Long choreId,
             @IsLogin LoginStatus loginStatus) {
 
-        return ResponseCustom.OK(choreService.findChore(choreId, loginStatus));
+        return ResponseCustom.OK(choreService.findChore(choreId, loginStatus.getUserId()));
     }
 
     @Auth
@@ -62,7 +62,7 @@ public class ChoreController {
             @RequestParam Boolean status,
             @IsLogin LoginStatus loginStatus) {
 
-        choreService.setChoreLog(choreId, setTime, status, loginStatus);
+        choreService.setChoreLog(choreId, setTime, status, loginStatus.getUserId());
         return ResponseCustom.OK();
     }
 
@@ -73,7 +73,7 @@ public class ChoreController {
             @RequestBody @Valid ChoreUpdateReq choreUpdateReqDto,
             @IsLogin LoginStatus loginStatus) {
 
-        choreService.updateChore(choreId, choreUpdateReqDto, loginStatus);
+        choreService.updateChore(choreId, choreUpdateReqDto, loginStatus.getUserId());
         return ResponseCustom.OK();
     }
 
@@ -83,7 +83,7 @@ public class ChoreController {
             @PathVariable Long choreId,
             @IsLogin LoginStatus loginStatus) {
 
-        choreService.deleteChore(choreId, loginStatus);
+        choreService.deleteChore(choreId, loginStatus.getUserId());
         return ResponseCustom.OK();
     }
 

@@ -28,7 +28,7 @@ public class ChoreCreateReq {
     @NotNull(message = "집안일 이름을 입력해주세요.")
     private String name;
 
-    @NotNull(message = "시작날짜을 입력해주세요.")
+    @NotNull(message = "시작날짜를 입력해주세요.")
     private LocalDate startDate;
 
     private LocalDate lastDate;

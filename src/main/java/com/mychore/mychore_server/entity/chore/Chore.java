@@ -65,13 +65,12 @@ public class Chore extends BaseEntity {
     private List<ChoreLog> choreLogList = new ArrayList<>();
 
     public void updateInfo(ChoreUpdateReq choreUpdateReqDto) {
-        if (choreUpdateReqDto.getName() != null) this.name = choreUpdateReqDto.getName();
-        if (choreUpdateReqDto.getIsAcceptNoti() != null) this.isAcceptNoti = choreUpdateReqDto.getIsAcceptNoti();
-        if (choreUpdateReqDto.getStartDate() != null) this.startDate = choreUpdateReqDto.getStartDate();
-        if (choreUpdateReqDto.getLastDate() != null) this.lastDate = choreUpdateReqDto.getLastDate();
-        if (choreUpdateReqDto.getRepetition() != null) this.repetition = choreUpdateReqDto.getRepetition();
-        if (choreUpdateReqDto.getNotiTime() != null) this.notiTime = choreUpdateReqDto.getNotiTime();
-        if (choreUpdateReqDto.getIsAcceptNoti()!=null && !choreUpdateReqDto.getIsAcceptNoti()) this.notiTime = null;
+        this.name = choreUpdateReqDto.getName();
+        this.isAcceptNoti = choreUpdateReqDto.getIsAcceptNoti();
+        this.startDate = choreUpdateReqDto.getStartDate();
+        this.lastDate = choreUpdateReqDto.getLastDate();
+        this.repetition = choreUpdateReqDto.getRepetition();
+        this.notiTime = choreUpdateReqDto.getNotiTime();
     }
 
     public void updateUser(User newUser) {
