@@ -4,6 +4,7 @@ import com.mychore.mychore_server.dto.ResponseCustom;
 import com.mychore.mychore_server.dto.user.request.PatchProfileReq;
 import com.mychore.mychore_server.dto.user.request.UserLogInReq;
 import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
+import com.mychore.mychore_server.dto.user.response.GetProfileRes;
 import com.mychore.mychore_server.dto.user.response.UserTokenRes;
 import com.mychore.mychore_server.global.resolver.Auth;
 import com.mychore.mychore_server.global.resolver.IsLogin;
@@ -30,6 +31,13 @@ public class UserController {
     @PostMapping("/login")
     public ResponseCustom<UserTokenRes> logIn(@RequestBody @Valid UserLogInReq userLogInReq){
         return ResponseCustom.OK(userService.login(userLogInReq));
+    }
+
+    // 프로필 조회
+    @Auth
+    @GetMapping
+    public ResponseCustom<GetProfileRes> getProfile(@IsLogin LoginStatus loginStatus){
+        return ResponseCustom.OK(userService.getProfile(loginStatus.getUserId()));
     }
 
     // 프로필 수정

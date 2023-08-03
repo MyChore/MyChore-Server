@@ -3,6 +3,7 @@ package com.mychore.mychore_server.service;
 import com.mychore.mychore_server.dto.user.UserAssembler;
 import com.mychore.mychore_server.dto.user.request.PatchProfileReq;
 import com.mychore.mychore_server.dto.user.request.UserLogInReq;
+import com.mychore.mychore_server.dto.user.response.GetProfileRes;
 import com.mychore.mychore_server.dto.user.response.UserTokenRes;
 import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
 import com.mychore.mychore_server.entity.user.User;
@@ -48,6 +49,12 @@ public class UserService {
         User user = userRepository.findByEmailAndProviderAndStatus(userLogInReq.getEmail(), Provider.getByName(userLogInReq.getProvider()), ACTIVE_STATUS)
                 .orElseThrow(EmailNotExistException::new);
         return UserTokenRes.toDto(jwtUtils.createToken(user));
+    }
+
+    // 프로필 조회
+    public GetProfileRes getProfile(Long userId) {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        return userAssembler.toGetProfileDto(user);
     }
 
     // 프로필 수정
