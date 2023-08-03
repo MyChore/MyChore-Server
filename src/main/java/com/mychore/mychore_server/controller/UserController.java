@@ -43,9 +43,17 @@ public class UserController {
     // 프로필 수정
     @Auth
     @PatchMapping
-    public ResponseCustom<UserTokenRes> editProfile(@RequestBody @Valid PatchProfileReq patchProfileReq,
+    public ResponseCustom<Void> editProfile(@RequestBody @Valid PatchProfileReq patchProfileReq,
                                                     @IsLogin LoginStatus loginStatus){
         userService.editProfile(loginStatus.getUserId(), patchProfileReq);
+        return ResponseCustom.OK();
+    }
+
+    // 알림 설정 수정
+    @Auth
+    @PatchMapping("/noti")
+    public ResponseCustom<Void> editNotiAgree(Integer type, @IsLogin LoginStatus loginStatus){
+        userService.editNotiAgree(loginStatus.getUserId(), type);
         return ResponseCustom.OK();
     }
 
