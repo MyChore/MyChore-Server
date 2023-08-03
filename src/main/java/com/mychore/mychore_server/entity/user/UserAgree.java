@@ -31,21 +31,30 @@ public class UserAgree extends BaseEntity {
 
     private LocalDateTime acceptEmailDate;
 
+    // 집안일 알림
     @NonNull
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
-    private Boolean isAcceptTodayNoti = true;
+    private Boolean isAgreeChoreNoti = true;
 
+    // 오늘의 집안일 알림
     @NonNull
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
-    private Boolean isAcceptNewUserNoti = true;
+    private Boolean isAgreeTodayNoti = true;
 
+    // 그룹원 추가 알림
     @NonNull
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
-    private Boolean isAcceptDoneNoti = true;
+    private Boolean isAgreeNewUserNoti = true;
 
+    // 그룹원의 집안일 완료 알림
     @NonNull
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
-    private Boolean isAcceptDeleteNoti = true;
+    private Boolean isAgreeDoneNoti = true;
+
+    // 그룹 삭제 알림
+    @NonNull
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isAgreeDeleteNoti = true;
 
     @Builder
     public UserAgree(@NonNull User user, @NonNull Boolean is14Over, LocalDateTime acceptEmailDate) {
