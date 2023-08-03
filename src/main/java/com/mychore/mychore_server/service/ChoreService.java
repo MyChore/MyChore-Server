@@ -11,6 +11,7 @@ import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.Constant;
+import com.mychore.mychore_server.global.resolver.LoginStatus;
 import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,9 @@ public class ChoreService {
 
     private final ChoreAssembler choreAssembler;
 
-    public String saveChore(ChoreCreateReq choreSaveReqDto) {
+    public Void saveChore(ChoreCreateReq choreSaveReqDto, LoginStatus loginStatus) {
 
+        choreAssembler.isGroupMember(choreSaveReqDto.getGroupId(), loginStatus.getUserId());
         choreAssembler.isValidSaveReqBody(choreSaveReqDto);
 
         User user = choreAssembler.findUserEntity(choreSaveReqDto.getUserId());
@@ -40,76 +42,76 @@ public class ChoreService {
 
         choreRepository.save(choreAssembler.toEntity(user, roomFurniture, group, choreSaveReqDto));
 
-        return "집안일 생성이 완료되었습니다.";
+        return null;
     }
 
-    public ChoreSimpleResp findChore(Long choreId) {
+    public ChoreSimpleResp findChore(Long choreId, LoginStatus loginStatus) {
 
-        return ChoreSimpleResp.toDto(choreAssembler.findChoreEntity(choreId));
+        Chore choreEntity = choreAssembler.findChoreEntity(choreId);
+        choreAssembler.isGroupMember(choreEntity.getGroup().getId(), loginStatus.getUserId());
+
+        return ChoreSimpleResp.toDto(choreEntity);
 
     }
 
     public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId,
-                                            LocalDate fromTime, LocalDate toTime) {
+                                            LocalDate fromTime, LocalDate toTime, LoginStatus loginStatus) {
 
+        choreAssembler.isGroupMember(groupId, loginStatus.getUserId());
         choreAssembler.isValidfindChoresParameter(userId, groupId, roomId, fromTime, toTime);
 
         return choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
     }
 
-    public String updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto) {
+    public Void updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto, LoginStatus loginStatus) {
 
         Chore findChore = choreAssembler.findChoreEntity(choreId);
 
+        choreAssembler.isGroupMember(findChore.getGroup().getId(), loginStatus.getUserId());
         choreAssembler.isValidUpdateReqBody(findChore, choreUpdateReqDto);
 
         findChore.updateInfo(choreUpdateReqDto);
 
-        if (choreUpdateReqDto.getUserId()!=null){
-            if(!findChore.getUser().getId().equals(choreUpdateReqDto.getUserId())) {
+
+        if(!findChore.getUser().getId().equals(choreUpdateReqDto.getUserId())) {
                 findChore.updateUser(choreAssembler.findUserEntity(choreUpdateReqDto.getUserId()));
-            }
         }
 
-        if (choreUpdateReqDto.getRoomFurnitureId()!=null) {
-            if(!findChore.getRoomFurniture().getId().equals(choreUpdateReqDto.getRoomFurnitureId())) {
+        if(!findChore.getRoomFurniture().getId().equals(choreUpdateReqDto.getRoomFurnitureId())) {
                 findChore.updateRoomFurniture(choreAssembler.findRoomFurnitureEntity(choreUpdateReqDto.getRoomFurnitureId()));
-            }
         }
 
-        return "집안일 수정이 완료되었습니다.";
+        return null;
     }
 
-    public String setChoreLog(Long choreId, LocalDate setDate, Boolean bool) {
+    public Void setChoreLog(Long choreId, LocalDate setDate, Boolean bool, LoginStatus loginStatus) {
 
         Chore findChore = choreAssembler.findChoreEntity(choreId);
 
+        choreAssembler.isGroupMember(findChore.getGroup().getId(), loginStatus.getUserId());
         choreAssembler.isValidSetLogReqParameter(findChore, setDate);
 
         ChoreLog findChoreLog =
                 choreLogRepository.findChoreLogByChoreAndSetDateBetween(findChore, setDate, setDate);
 
         if (findChoreLog == null) {
-            ChoreLog newChoreLog = ChoreLog.builder()
-                    .chore(findChore)
-                    .setDate(setDate)
-                    .isComplete(bool)
-                    .build();
-            choreLogRepository.save(newChoreLog);
-            return "집안일을 완료했습니다.";
+            choreAssembler.createChoreLog(findChore, setDate, bool);
         } else {
             findChoreLog.updateIsComplete(bool);
-            return "집안일 완료 상태가 수정되었습니다.";
         }
 
+        return null;
 
     }
 
-    public String deleteChore(Long choreId) {
+    public Void deleteChore(Long choreId, LoginStatus loginStatus) {
 
-        choreAssembler.findChoreEntity(choreId).setStatus(Constant.INACTIVE_STATUS);
+        Chore choreEntity = choreAssembler.findChoreEntity(choreId);
+        choreAssembler.isGroupMember(choreEntity.getGroup().getId(), loginStatus.getUserId());
 
-        return "집안일이 삭제 상태로 변경되었습니다.";
+        choreEntity.setStatus(Constant.INACTIVE_STATUS);
+
+        return null;
     }
 
 

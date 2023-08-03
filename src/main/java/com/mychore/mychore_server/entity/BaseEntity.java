@@ -23,10 +23,10 @@ public class BaseEntity implements Serializable {
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updateAt = LocalDateTime.now();
+    private LocalDateTime updateAt;
 
     @Setter
     @Column(nullable = false, columnDefinition = "varchar(10) default 'active'")
-    private String status = "active";
+    private String status;
 
 }

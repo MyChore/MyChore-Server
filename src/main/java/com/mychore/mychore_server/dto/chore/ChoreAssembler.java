@@ -3,6 +3,7 @@ package com.mychore.mychore_server.dto.chore;
 import com.mychore.mychore_server.dto.chore.request.ChoreCreateReq;
 import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
 import com.mychore.mychore_server.entity.chore.Chore;
+import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.Room;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
@@ -28,6 +29,8 @@ public class ChoreAssembler {
     private final GroupRepository groupRepository;
     private final RoomRepository roomRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
+    private final GroupUserRepository groupUserRepository;
+    private final ChoreLogRepository choreLogRepository;
 
     public Chore toEntity(User user, RoomFurniture roomFurniture, Group group, ChoreCreateReq choreCreateReq) {
 
@@ -38,7 +41,7 @@ public class ChoreAssembler {
                 .name(choreCreateReq.getName())
                 .isAcceptNoti(choreCreateReq.getIsAcceptNoti()==null ? true : choreCreateReq.getIsAcceptNoti())
                 .startDate(choreCreateReq.getStartDate())
-                .lastDate(choreCreateReq.getRepetition()==null? choreCreateReq.getStartDate() : choreCreateReq.getLastDate())
+                .lastDate(choreCreateReq.getRepetition()==null ? choreCreateReq.getStartDate() : choreCreateReq.getLastDate())
                 .repetition(choreCreateReq.getRepetition())
                 .notiTime(choreCreateReq.getIsAcceptNoti() ? choreCreateReq.getNotiTime() : null)
                 .build();
@@ -70,6 +73,24 @@ public class ChoreAssembler {
                 .orElseThrow(() -> new ChoreNotFoundException(choreId));
     }
 
+    public Void isGroupMember(Long groupId, Long userId) {
+
+        groupUserRepository.findGroupUserByUserAndGroup(findUserEntity(userId), findGroupEntity(groupId))
+                .orElseThrow(() -> new ExpressionException("해당 그룹에 속해있지 않습니다."));
+
+        return null;
+
+    }
+
+    public void createChoreLog(Chore chore, LocalDate setDate, Boolean bool) {
+        choreLogRepository.save(ChoreLog.builder()
+                .chore(chore)
+                .setDate(setDate)
+                .isComplete(bool)
+                .build());
+    }
+
+
     // findChores 검증 로직
     public Void isValidfindChoresParameter(Long userId, Long groupId, Long roomId, LocalDate fromTime, LocalDate toTime) {
 
@@ -77,16 +98,16 @@ public class ChoreAssembler {
             findUserEntity(userId);
         }
 
-        if (groupId!=null) {
-            findGroupEntity(groupId);
-        }
+
+        findGroupEntity(groupId);
+
 
         if (roomId!=null) {
             findRoomEntity(roomId);
         }
 
         if (fromTime.isAfter(toTime)) {
-            new ChoreBadRequestException("조회구간");
+            throw new ChoreBadRequestException("조회구간");
         }
 
         return null;
@@ -95,28 +116,13 @@ public class ChoreAssembler {
 
     // updateChore 검증
     public Void isValidUpdateReqBody(Chore chore, ChoreUpdateReq choreUpdateReqDto) {
-        String result = "";
 
-        if (choreUpdateReqDto.getIsAcceptNoti()!=null) {
-            if (choreUpdateReqDto.getIsAcceptNoti() && choreUpdateReqDto.getNotiTime()==null) {
-                result += (result=="") ? "알림시간" : ", 알림시간";
-            }
+        if (choreUpdateReqDto.getIsAcceptNoti() != null && choreUpdateReqDto.getIsAcceptNoti() && choreUpdateReqDto.getNotiTime() == null) {
+            throw new ChoreBadRequestException("알림시간");
         }
 
-        if (choreUpdateReqDto.getStartDate()!=null) {
-            if(choreUpdateReqDto.getStartDate().isAfter(chore.getLastDate())) {
-                result += (result=="") ? "시작날짜" : ", 시작날짜";
-            }
-        }
-
-        if (choreUpdateReqDto.getLastDate()!=null) {
-            if(choreUpdateReqDto.getLastDate().isBefore(chore.getStartDate())) {
-                result += (result=="") ? "종료날짜" : ", 종료날짜";
-            }
-        }
-
-        if (result!="") {
-            throw new ChoreBadRequestException(result);
+        if (choreUpdateReqDto.getLastDate()!=null && choreUpdateReqDto.getLastDate().isBefore(chore.getStartDate())) {
+            throw new ChoreBadRequestException("종료날짜");
         }
 
         return null;
@@ -126,7 +132,11 @@ public class ChoreAssembler {
     //  setChoreLog 파라미터 확인하는 함수
     public Void isValidSetLogReqParameter(Chore chore, LocalDate setDate) {
 
-        if (setDate.isBefore(chore.getStartDate()) || setDate.isAfter(chore.getLastDate())) {
+        if (setDate.isBefore(chore.getStartDate())) {
+            throw new ChoreBadRequestException("설정시간");
+        }
+
+        if (chore.getLastDate()!=null && setDate.isAfter(chore.getLastDate())) {
             throw new ChoreBadRequestException("설정시간");
         }
 
@@ -137,22 +147,12 @@ public class ChoreAssembler {
     // saveChore Req 확인 함수
     public Void isValidSaveReqBody(ChoreCreateReq choreSaveReqDto) {
 
-        String result = "";
-
-        if (choreSaveReqDto.getLastDate()!=null) {
-            if (choreSaveReqDto.getStartDate().isAfter(choreSaveReqDto.getLastDate())) {
-                result += (result=="") ? "종료날짜" : ", 종료날짜";
-            }
+        if (choreSaveReqDto.getLastDate()!=null && choreSaveReqDto.getStartDate().isAfter(choreSaveReqDto.getLastDate())) {
+            throw new ChoreBadRequestException("종료날짜");
         }
 
-        if (choreSaveReqDto.getIsAcceptNoti()!=null&&choreSaveReqDto.getIsAcceptNoti()) {
-            if (choreSaveReqDto.getNotiTime()==null) {
-                result += (result=="") ? "알림시간" : ", 알림시간";
-            }
-        }
-
-        if (result!="") {
-            throw new ChoreBadRequestException(result);
+        if (choreSaveReqDto.getIsAcceptNoti()!=null && choreSaveReqDto.getIsAcceptNoti() && choreSaveReqDto.getNotiTime()==null) {
+            throw new ChoreBadRequestException("종료날짜");
         }
 
         return null;

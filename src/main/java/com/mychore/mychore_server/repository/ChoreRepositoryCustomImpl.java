@@ -33,7 +33,7 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
                 "left join fetch c.choreLogList cl " +
                 "where g.id = :groupId " +
                 "and c.status = :status " +
-                "and (c.lastDate is null or c.lastDate > :fromTime) ";
+                "and (c.lastDate is null or c.lastDate >= :fromTime) ";
 
         if (userId != null) {
             query += "and u.id = :userId ";
@@ -67,15 +67,15 @@ public class ChoreRepositoryCustomImpl implements ChoreRepositoryCustom {
             List<ChoreLog> choreLogList =
                     choreResponse.getChoreLogList()
                     .stream()
-                    .filter(log -> !log.getSetDate().isBefore(fromTime) && !log.getSetDate().isAfter(toTime))
+                    .filter(log -> !log.getSetDate().isBefore(fromTime.minusDays(1)) && !log.getSetDate().isAfter(toTime.plusDays(1)))
                     .collect(Collectors.toList());
 
             choreLogList.sort(Comparator.comparing(ChoreLog::getSetDate));
 
             // 반복 설정이 안되어있으면 하나만 생성하기
             if (repetition == null) {
-                if (startDate.isAfter(fromTime) && startDate.isEqual(fromTime)){
-                    if (startDate.isBefore(toTime) && startDate.isEqual(toTime)) {
+                if (startDate.isEqual(fromTime) || startDate.isAfter(fromTime)){
+                    if (startDate.isEqual(toTime) || startDate.isBefore(toTime)) {
                         choreLists.add(createChoreDtoResponse(choreResponse, choreLogList, startDate));
                     }
                 }
