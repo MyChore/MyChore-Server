@@ -11,7 +11,6 @@ import com.mychore.mychore_server.global.resolver.LoginStatus;
 import com.mychore.mychore_server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,5 +39,11 @@ public class UserController {
                                                     @IsLogin LoginStatus loginStatus){
         userService.editProfile(loginStatus.getUserId(), patchProfileReq);
         return ResponseCustom.OK();
+    }
+
+    // 가입 전 닉네임 중복 확인
+    @GetMapping("check-nickname")
+    public ResponseCustom<Boolean> checkNickname(String nickname){
+        return ResponseCustom.OK(userService.checkNicknameWithSignUp(nickname));
     }
 }
