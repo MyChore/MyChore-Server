@@ -33,6 +33,11 @@ public class UserExceptionController {
         log.error(e.getMessage());
         return ResponseCustom.BAD_REQUEST(e.getMessage());
     }
+    @ExceptionHandler(WrongNotiTypeException.class)
+    public ResponseCustom<Void> catchWrongNotiTypeException(WrongNotiTypeException e) {
+        log.error(e.getMessage());
+        return ResponseCustom.BAD_REQUEST(e.getMessage());
+    }
     @ExceptionHandler(AuthAnnotationIsNowhereException.class)
     public ResponseCustom<Void> catchAuthAnnotationIsNowhereException(AuthAnnotationIsNowhereException e) {
         log.error(e.getMessage());
