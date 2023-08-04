@@ -68,7 +68,7 @@ public class UserController {
     // 알림 설정 수정
     @Auth
     @PatchMapping("/noti")
-    public ResponseCustom<Void> editNotiAgree(Integer type, @IsLogin LoginStatus loginStatus){
+    public ResponseCustom<Void> editNotiAgree(String type, @IsLogin LoginStatus loginStatus){
         userService.editNotiAgree(loginStatus.getUserId(), type);
         return ResponseCustom.OK();
     }
