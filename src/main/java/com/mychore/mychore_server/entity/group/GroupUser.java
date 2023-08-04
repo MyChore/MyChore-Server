@@ -4,12 +4,12 @@ import com.mychore.mychore_server.global.constants.Role;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
+@DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class GroupUser extends BaseEntity {
@@ -25,11 +25,18 @@ public class GroupUser extends BaseEntity {
     private Group group;
 
     @NonNull
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @NonNull
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Builder
+    public GroupUser(Group group, User user, Role role){
+        this.group = group;
+        this.user = user;
+        this.role = role;
+    }
 }

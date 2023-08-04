@@ -9,6 +9,10 @@ import java.util.Optional;
 
 public interface GroupUserRepository extends JpaRepository<GroupUser, Long> {
 
+    Optional<GroupUser> findByUserAndGroup(User user, Group group, String status);
+
+
     Optional<GroupUser> findGroupUserByUserAndGroupAndStatus(User user, Group group, String status);
+
 
 }
