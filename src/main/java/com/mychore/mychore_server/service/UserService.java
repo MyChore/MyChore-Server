@@ -34,7 +34,7 @@ public class UserService {
     public UserTokenRes signUp(UserSignUpReq userSignUpReq) {
         if (userRepository.findByEmailAndStatus(userSignUpReq.getEmail(), ACTIVE_STATUS).isPresent()) {
             throw new EmailAlreadyExistException();
-        } else if (checkNicknameWithSignUp(userSignUpReq.getNickname())) {
+        } else if (!checkNicknameWithSignUp(userSignUpReq.getNickname())) {
             throw new NicknameAlreadyExistException();
         } else {
             User user = userRepository.save(userAssembler.toEntity(userSignUpReq));
@@ -53,7 +53,7 @@ public class UserService {
     // 프로필 수정
     public void editProfile(Long userId, PatchProfileReq patchProfileReq) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
-        if (!checkNicknameWithEdit(patchProfileReq.getNickname(), userId)){
+        if (checkNicknameWithEdit(patchProfileReq.getNickname(), userId)){
             user.editProfile(patchProfileReq);
             userRepository.save(user);
         } else throw new NicknameAlreadyExistException();
@@ -62,12 +62,12 @@ public class UserService {
     // 가입 시 닉네임 중복체크
     public boolean checkNicknameWithSignUp(String nickname){
         userAssembler.isValidNickname(nickname);
-        return userRepository.findByNicknameAndStatus(nickname, ACTIVE_STATUS).isPresent();
+        return userRepository.findByNicknameAndStatus(nickname, ACTIVE_STATUS).isEmpty();
     }
 
     // 프로필 수정 시 닉네임 중복체크
-    public boolean checkNicknameWithEdit(String nickname, Long userId){
+    private boolean checkNicknameWithEdit(String nickname, Long userId){
         userAssembler.isValidNickname(nickname);
-        return userRepository.findByNicknameAndStatusAndIdNot(nickname, ACTIVE_STATUS, userId).isPresent();
+        return userRepository.findByNicknameAndStatusAndIdNot(nickname, ACTIVE_STATUS, userId).isEmpty();
     }
 }
