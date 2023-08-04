@@ -77,11 +77,11 @@ public class GroupService {
     }
 
     public Long joinGroup(String inviteCode, Long userId){
-        Group group = groupRepository.findByInviteCode(inviteCode, ACTIVE_STATUS).orElseThrow(InvalidInvitationCodeException::new);
+        Group group = groupRepository.findByInviteCodeAndStatus(inviteCode, ACTIVE_STATUS).orElseThrow(InvalidInvitationCodeException::new);
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        groupUserRepository.findByUserAndGroup(user, group, ACTIVE_STATUS).ifPresent( m -> {throw new GroupAlreadyExistException();});
+        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS).ifPresent( m -> {throw new GroupAlreadyExistException();});
 
         groupUserRepository.save(groupAssembler.toEntity(group, user, MEMBER));
         return group.getId();
