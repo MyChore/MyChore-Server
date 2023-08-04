@@ -1,6 +1,7 @@
 package com.mychore.mychore_server.dto.user;
 
 import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
+import com.mychore.mychore_server.dto.user.response.GetProfileRes;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.entity.user.UserAgree;
 import com.mychore.mychore_server.exception.user.InvalidNicknameException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +35,16 @@ public class UserAssembler {
                 .user(user)
                 .is14Over(userSignUpReq.getIs14Over())
                 .acceptEmailDate(userSignUpReq.getIsAcceptEmail() ? LocalDateTime.now() : null)
+                .build();
+    }
+
+    public GetProfileRes toGetProfileDto(User user){
+        return GetProfileRes.builder()
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .imgKey(user.getImgKey())
+                .gender(user.getGender().getGenderName())
+                .birth(user.getBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .build();
     }
 
