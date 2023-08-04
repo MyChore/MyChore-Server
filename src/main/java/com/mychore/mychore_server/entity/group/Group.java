@@ -10,7 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter @Setter
+@Getter
 @Table(name = "floor_group")
 public class Group extends BaseEntity {
 
@@ -31,9 +31,14 @@ public class Group extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FloorType floorType;
 
+    @Builder
     public Group(String inviteCode, String name, FloorType floorType){
         this.inviteCode = inviteCode;
         this.name = name;
         this.floorType = floorType;
+    }
+
+    public void SetId(Long groupId){
+        this.id = groupId;
     }
 }

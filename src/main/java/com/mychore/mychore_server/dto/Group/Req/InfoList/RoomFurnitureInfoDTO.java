@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
 public class RoomFurnitureInfoDTO {
     private Long roomId;
     private List<FurnitureInfoDTO> furnitureInfoList;

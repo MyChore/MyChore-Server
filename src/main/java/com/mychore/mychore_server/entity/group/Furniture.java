@@ -1,6 +1,5 @@
 package com.mychore.mychore_server.entity.group;
 
-import com.mychore.mychore_server.dto.Group.Res.AddFurnitureResDTO;
 import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.global.constants.FurnitureType;
 import jakarta.persistence.*;
@@ -11,7 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter @Setter
+@Getter
 public class Furniture extends BaseEntity {
 
     @Id
@@ -38,10 +37,17 @@ public class Furniture extends BaseEntity {
     private FurnitureType furnitureType;
 
     @Builder
-    public Furniture(AddFurnitureResDTO reqDTO){
-        this.name = reqDTO.getName();
-        this.sizeX = reqDTO.getSizeX();
-        this.sizeY = reqDTO.getSizeY();
-        this.furnitureType = reqDTO.getFurnitureType();
+    public Furniture(@NonNull String name, @NonNull Integer sizeX, @NonNull Integer sizeY, String imgKey, FurnitureType furnitureType){
+        this.name = name;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.furnitureType = furnitureType;
     }
+
+//    public void SetFurniture(AddFurnitureReqDTO reqDTO){
+//        this.name = reqDTO.getName();
+//        this.sizeX = reqDTO.getSizeX();
+//        this.sizeY = reqDTO.getSizeY();
+//        this.furnitureType = reqDTO.getFurnitureType();
+//    }
 }

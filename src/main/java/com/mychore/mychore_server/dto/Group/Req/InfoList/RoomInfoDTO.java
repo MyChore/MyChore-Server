@@ -4,7 +4,6 @@ import com.mychore.mychore_server.global.constants.RoomType;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
 public class RoomInfoDTO {
     private Integer sizeX;

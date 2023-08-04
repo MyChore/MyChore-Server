@@ -3,10 +3,7 @@ package com.mychore.mychore_server.entity.group;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -42,11 +39,12 @@ public class RoomFurniture extends BaseEntity {
     @NonNull
     private Integer rotation;
 
-    public RoomFurniture(Room room, Furniture furniture, FurnitureInfoDTO infoDTO){
+    @Builder
+    public RoomFurniture(@NonNull Room room, @NonNull Furniture furniture, @NonNull Integer locationX, @NonNull Integer locationY, @NonNull Integer rotation){
         this.room = room;
         this.furniture = furniture;
-        this.locationX = infoDTO.getLocationX();
-        this.locationY = infoDTO.getLocationY();
-        this.rotation = infoDTO.getRotation();
+        this.locationX = locationX;
+        this.locationY = locationY;
+        this.rotation = rotation;
     }
 }

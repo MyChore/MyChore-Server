@@ -6,8 +6,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
 public class PostRoomReqDTO {
-    private Long groupId;
     private List<RoomFurnitureInfoDTO> roomFurnitureInfoList;
 }

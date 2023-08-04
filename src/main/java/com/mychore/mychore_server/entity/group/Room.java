@@ -4,10 +4,7 @@ import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
 import com.mychore.mychore_server.global.constants.RoomType;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -51,13 +48,16 @@ public class Room extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
 
-    public Room(Group group, RoomInfoDTO roomInfoDTO){
+    @Builder
+    public Room (@NonNull Group group, @NonNull Integer sizeX, @NonNull Integer sizeY, @NonNull Integer locationX, @NonNull Integer locationY, @NonNull RoomType roomType, @NonNull String name){
         this.group = group;
-        this.sizeX = roomInfoDTO.getSizeX();
-        this.sizeY = roomInfoDTO.getSizeY();
-        this.locationX = roomInfoDTO.getLocationX();
-        this.locationY = roomInfoDTO.getLocationY();
-        this.roomType = roomInfoDTO.getRoomType();
-        this.name = roomInfoDTO.getName();
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.locationX = locationX;
+        this.locationY = locationY;
+        this.roomType = roomType;
+        this.name = name;
     }
+
+
 }
