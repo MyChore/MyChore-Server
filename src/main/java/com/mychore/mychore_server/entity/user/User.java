@@ -48,21 +48,25 @@ public class User extends BaseEntity {
 
     private String refreshToken;
 
+    private String deviceToken;
+
     @Builder
-    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgKey, @NonNull Provider provider) {
+    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgKey, @NonNull Provider provider, String deviceToken) {
         this.email = email;
         this.nickname = nickname;
         this.gender = gender;
         this.birth = birth;
         this.imgKey = imgKey;
         this.provider = provider;
+        this.deviceToken = deviceToken;
     }
 
-    public void editProfile(PatchProfileReq patchProfileReq){
+    public void editProfile(PatchProfileReq patchProfileReq) {
         editNickname(patchProfileReq.getNickname());
         editBirth(patchProfileReq.getBirth());
         editGender(patchProfileReq.getGender());
     }
+
     public void editGender(String gender) {
         this.gender = Gender.getByName(gender);
     }
@@ -91,5 +95,4 @@ public class User extends BaseEntity {
         removeTokens();
         this.setStatus(INACTIVE_STATUS);
     }
-
 }
