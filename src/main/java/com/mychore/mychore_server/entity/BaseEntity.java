@@ -23,7 +23,7 @@ public class BaseEntity implements Serializable {
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @Setter
     @Column(nullable = false, columnDefinition = "varchar(10) default 'active'")

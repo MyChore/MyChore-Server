@@ -8,14 +8,18 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
+
+import static com.mychore.mychore_server.global.constants.Constant.INACTIVE_STATUS;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @DynamicUpdate
 @Getter
+@SQLDelete(sql = "UPDATE user SET status = 'inactive', updated_at = current_timestamp WHERE user_id = ?")
 public class User extends BaseEntity {
 
     @Id
@@ -62,16 +66,30 @@ public class User extends BaseEntity {
     public void editGender(String gender) {
         this.gender = Gender.getByName(gender);
     }
+
     public void editBirth(String date) {
         this.birth = LocalDate.parse(date);
     }
+
     public void editNickname(String nickname) {
         this.nickname = nickname;
     }
+
     public void editImgKey(String imgKey) {
         this.imgKey = imgKey;
     }
+
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
+
+    public void removeTokens() {
+        this.refreshToken = null;
+    }
+
+    public void withdraw() {
+        removeTokens();
+        this.setStatus(INACTIVE_STATUS);
+    }
+
 }

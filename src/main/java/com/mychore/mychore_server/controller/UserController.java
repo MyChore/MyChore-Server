@@ -33,6 +33,22 @@ public class UserController {
         return ResponseCustom.OK(userService.login(userLogInReq));
     }
 
+    // 로그아웃
+    @Auth
+    @PatchMapping("/logout")
+    public ResponseCustom<Void> logOut(@IsLogin LoginStatus loginStatus){
+        userService.logout(loginStatus.getUserId());
+        return ResponseCustom.OK();
+    }
+
+    // 회원탈퇴
+    @Auth
+    @DeleteMapping
+    public ResponseCustom<Void> withdraw(@IsLogin LoginStatus loginStatus){
+        userService.withdraw(loginStatus.getUserId());
+        return ResponseCustom.OK();
+    }
+
     // 프로필 조회
     @Auth
     @GetMapping
@@ -52,7 +68,7 @@ public class UserController {
     // 알림 설정 수정
     @Auth
     @PatchMapping("/noti")
-    public ResponseCustom<Void> editNotiAgree(Integer type, @IsLogin LoginStatus loginStatus){
+    public ResponseCustom<Void> editNotiAgree(String type, @IsLogin LoginStatus loginStatus){
         userService.editNotiAgree(loginStatus.getUserId(), type);
         return ResponseCustom.OK();
     }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
+import static com.mychore.mychore_server.global.constants.Constant.User.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,20 @@ public class UserService {
         return UserTokenRes.toDto(jwtUtils.createToken(user));
     }
 
+    // 로그아웃
+    public void logout(Long userId) {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        user.removeTokens();
+        userRepository.save(user);
+    }
+
+    // 회원탈퇴
+    public void withdraw(Long userId) {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        user.withdraw();
+        userRepository.save(user);
+    }
+
     // 프로필 조회
     public GetProfileRes getProfile(Long userId) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
@@ -66,14 +81,14 @@ public class UserService {
 
     // 알림 설정 수정
     @Transactional
-    public void editNotiAgree(Long userId, Integer type) {
+    public void editNotiAgree(Long userId, String type) {
         UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
         switch (type) {
-            case 1 -> userAgree.setIsAgreeChoreNoti(!userAgree.getIsAgreeChoreNoti());
-            case 2 -> userAgree.setIsAgreeDoneNoti(!userAgree.getIsAgreeDoneNoti());
-            case 3 -> userAgree.setIsAgreeTodayNoti(!userAgree.getIsAgreeTodayNoti());
-            case 4 -> userAgree.setIsAgreeNewUserNoti(!userAgree.getIsAgreeNewUserNoti());
-            case 5 -> userAgree.setIsAgreeDeleteNoti(!userAgree.getIsAgreeDeleteNoti());
+            case CHORE -> userAgree.setIsAgreeChoreNoti(!userAgree.getIsAgreeChoreNoti());
+            case DONE_CHORE -> userAgree.setIsAgreeDoneNoti(!userAgree.getIsAgreeDoneNoti());
+            case TODAY -> userAgree.setIsAgreeTodayNoti(!userAgree.getIsAgreeTodayNoti());
+            case NEW_USER -> userAgree.setIsAgreeNewUserNoti(!userAgree.getIsAgreeNewUserNoti());
+            case DELETE -> userAgree.setIsAgreeDeleteNoti(!userAgree.getIsAgreeDeleteNoti());
             default -> throw new WrongNotiTypeException();
         }
     }
