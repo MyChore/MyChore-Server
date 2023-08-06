@@ -3,6 +3,7 @@ name: MyChore server CI/CD
 on:
   push:
     branches: [ develop ]
+  
 
 env:
   S3_BUCKET_NAME: mychore-deploy
@@ -10,18 +11,12 @@ env:
   CODEDEPLOY_NAME: myChore
   CODEDEPLOY_GROUP: myChore-group
 
-permissions:
-  contents: read
-  
 jobs:
-  deploy:
-    name: Deploy
+  build:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
     
     - name: Set up JDK 17
       uses: actions/setup-java@v2
@@ -43,9 +38,7 @@ jobs:
       run: chmod +x gradlew
     
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-      with:
-        arguments: clean build -x test
+      run: ./gradlew clean build
       
     # 디렉토리 생성
     - name: Make Directory
