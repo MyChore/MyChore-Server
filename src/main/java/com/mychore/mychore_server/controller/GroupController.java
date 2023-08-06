@@ -6,6 +6,7 @@ import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
+import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
 import com.mychore.mychore_server.dto.ResponseCustom;
 import com.mychore.mychore_server.entity.group.Furniture;
 import com.mychore.mychore_server.global.constants.FurnitureType;
@@ -49,5 +50,11 @@ public class GroupController {
     @PostMapping("/{groupId}/furniture")
     public ResponseCustom<PostRoomResDTO> postRoomDetail(@PathVariable("groupId") Long groupId, @Valid @RequestBody PostRoomReqDTO reqDTO){
         return ResponseCustom.OK(groupService.postRoomDetail(reqDTO, groupId));
+    }
+
+    @Auth
+    @GetMapping("/{groupId}")
+    public ResponseCustom<StaticDataResDTO> getStaticData(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
+        return ResponseCustom.OK(groupService.getStaticData(groupId, loginStatus.getUserId()));
     }
 }

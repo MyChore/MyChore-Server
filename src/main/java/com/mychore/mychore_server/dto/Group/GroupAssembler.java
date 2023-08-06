@@ -7,6 +7,7 @@ import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FloorType;
 import com.mychore.mychore_server.global.constants.Role;
+import com.mychore.mychore_server.global.constants.RoomType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +46,7 @@ public class GroupAssembler {
                 .sizeY(roomInfoDTO.getSizeY())
                 .locationX(roomInfoDTO.getLocationX())
                 .locationY(roomInfoDTO.getLocationY())
-                .roomType(roomInfoDTO.getRoomType())
+                .roomType(RoomType.getByName(roomInfoDTO.getRoomName()))
                 .name(group.getName())
                 .build();
     }

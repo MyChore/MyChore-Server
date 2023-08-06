@@ -26,6 +26,12 @@ public class GroupExceptionController {
         return ResponseCustom.BAD_REQUEST(e.getMessage());
     }
 
+    @ExceptionHandler(InvalidApproachException.class)
+    public ResponseCustom<Void> catchInvalidApptoachException(InvalidApproachException e){
+        log.error(e.getMessage());
+        return ResponseCustom.BAD_REQUEST(e.getMessage());
+    }
+
     @ExceptionHandler(GroupNotFoundException.class)
     public ResponseCustom<Void> catchGroupNotFoundException(GroupNotFoundException e){
         log.error(e.getMessage());

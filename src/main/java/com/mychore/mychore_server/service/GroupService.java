@@ -2,14 +2,13 @@ package com.mychore.mychore_server.service;
 
 import com.mychore.mychore_server.dto.Group.GroupAssembler;
 import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomFurnitureInfoDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
+import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.exception.group.*;
@@ -19,6 +18,7 @@ import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,5 +111,29 @@ public class GroupService {
             }
         }
         return resDTO;
+    }
+
+    public StaticDataResDTO getStaticData(Long groupId, Long userId){
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS).orElseThrow(InvalidApproachException::new);
+
+        List<RoomInfoDTO> roomInfoDTOList = new ArrayList<>();
+        List<UserInfoDTO> userInfoDTOList = new ArrayList<>();
+
+        List<GroupUser> memberList = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
+        for(GroupUser member: memberList) { userInfoDTOList.add(new UserInfoDTO(member)); }
+        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
+        for(Room room: roomList){
+            List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
+            List<PlacedFurnitureInfoDTO> furnitureInfoDTOList = new ArrayList<>();
+            for(RoomFurniture furniture : furnitureList){
+                furnitureInfoDTOList.add(new PlacedFurnitureInfoDTO(furniture));
+            }
+            roomInfoDTOList.add(new RoomInfoDTO(room, furnitureInfoDTOList));
+        }
+
+
+        return new StaticDataResDTO(group, userInfoDTOList, roomInfoDTOList);
     }
 }
