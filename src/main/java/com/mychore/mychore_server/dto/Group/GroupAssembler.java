@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class GroupAssembler {
-    public Furniture toEntity(AddFurnitureReqDTO reqDTO){
+    public Furniture toFurnitureEntity(AddFurnitureReqDTO reqDTO){
         return Furniture.builder()
                 .name(reqDTO.getName())
                 .sizeX(reqDTO.getSizeX())
@@ -26,7 +26,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public Group toEntity(String inviteCode, String floorName, FloorType floorType){
+    public Group toGroupEntity(String inviteCode, String floorName, FloorType floorType){
         return Group.builder()
                 .name(floorName)
                 .floorType(floorType)
@@ -34,7 +34,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public GroupUser toEntity(Group group, User user, Role role){
+    public GroupUser toGroupUserEntity(Group group, User user, Role role){
         return GroupUser.builder()
                 .group(group)
                 .user(user)
@@ -42,7 +42,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public Room toEntity(Group group, RoomInfoDTO roomInfoDTO){
+    public Room toRoomEntity(Group group, RoomInfoDTO roomInfoDTO){
         return Room.builder()
                 .group(group)
                 .sizeX(roomInfoDTO.getSizeX())
@@ -54,7 +54,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public RoomFurniture toEntity(Room room, Furniture furniture, FurnitureInfoDTO furnInfoDTO){
+    public RoomFurniture toRoomFurnitureEntity(Room room, Furniture furniture, FurnitureInfoDTO furnInfoDTO){
         return RoomFurniture.builder()
                 .room(room)
                 .furniture(furniture)
@@ -64,7 +64,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public PostGroupResDTO toEntity(Long groupId, String inviteCode, Long groupUserId){
+    public PostGroupResDTO toPostGroupResDto(Long groupId, String inviteCode, Long groupUserId){
         return PostGroupResDTO.builder()
                 .groupId(groupId)
                 .inviteCode(inviteCode)
@@ -72,7 +72,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public static FurnitureResDTO toEntity(Furniture furniture){
+    public FurnitureResDTO toFurnitureResDto(Furniture furniture){
         return FurnitureResDTO.builder()
                 .furnitureId(furniture.getId())
                 .sizeX(furniture.getSizeX())
@@ -83,7 +83,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public PostRoomResDTO toEntity(Group group){
+    public PostRoomResDTO toPostRoomResDto(Group group){
         return PostRoomResDTO.builder()
                 .groupName(group.getName())
                 .inviteCode(group.getInviteCode())
