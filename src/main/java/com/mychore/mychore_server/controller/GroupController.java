@@ -6,10 +6,8 @@ import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
-import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
 import com.mychore.mychore_server.dto.ResponseCustom;
 import com.mychore.mychore_server.entity.group.Furniture;
-import com.mychore.mychore_server.global.constants.FurnitureType;
 import com.mychore.mychore_server.global.resolver.Auth;
 import com.mychore.mychore_server.global.resolver.IsLogin;
 import com.mychore.mychore_server.global.resolver.LoginStatus;
@@ -31,7 +29,7 @@ public class GroupController {
     }
 
     @Auth
-    @PostMapping
+    @PostMapping()
     public ResponseCustom<PostGroupResDTO> postGroup(@Valid @RequestBody PostGroupReqDTO reqDTO, @IsLogin LoginStatus loginStatus){
         return ResponseCustom.OK(groupService.postGroup(reqDTO, loginStatus.getUserId()));
     }
@@ -42,19 +40,13 @@ public class GroupController {
         return ResponseCustom.OK(groupService.joinGroup(inviteCode, loginStatus.getUserId()));
     }
 
-    @GetMapping("/furniture")
-    public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(@RequestParam("furnitureTypeName") String furnitureTypeName){
-        return ResponseCustom.OK(groupService.getFurnitureList(furnitureTypeName));
+    @GetMapping("/furniture/list")
+    public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(){
+        return ResponseCustom.OK(groupService.getFurnitureList());
     }
 
     @PostMapping("/{groupId}/furniture")
     public ResponseCustom<PostRoomResDTO> postRoomDetail(@PathVariable("groupId") Long groupId, @Valid @RequestBody PostRoomReqDTO reqDTO){
         return ResponseCustom.OK(groupService.postRoomDetail(reqDTO, groupId));
-    }
-
-    @Auth
-    @GetMapping("/{groupId}")
-    public ResponseCustom<StaticDataResDTO> getStaticData(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
-        return ResponseCustom.OK(groupService.getStaticData(groupId, loginStatus.getUserId()));
     }
 }
