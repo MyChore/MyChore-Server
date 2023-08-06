@@ -2,7 +2,8 @@ name: MyChore server CI/CD
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ hotfix/26-test ]
+  
 
 env:
   S3_BUCKET_NAME: mychore-deploy
