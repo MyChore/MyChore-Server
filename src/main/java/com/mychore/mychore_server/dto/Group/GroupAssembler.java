@@ -3,6 +3,9 @@ package com.mychore.mychore_server.dto.Group;
 import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
+import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
+import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
+import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FloorType;
@@ -58,6 +61,32 @@ public class GroupAssembler {
                 .locationX(furnInfoDTO.getLocationX())
                 .locationY(room.getLocationY())
                 .rotation(furnInfoDTO.getRotation())
+                .build();
+    }
+
+    public PostGroupResDTO toEntity(Long groupId, String inviteCode, Long groupUserId){
+        return PostGroupResDTO.builder()
+                .groupId(groupId)
+                .inviteCode(inviteCode)
+                .groupUserId(groupUserId)
+                .build();
+    }
+
+    public static FurnitureResDTO toEntity(Furniture furniture){
+        return FurnitureResDTO.builder()
+                .furnitureId(furniture.getId())
+                .sizeX(furniture.getSizeX())
+                .sizeY(furniture.getSizeY())
+                .name(furniture.getName())
+                .imgKey(furniture.getImgKey())
+                .furnitureTypeName(furniture.getFurnitureType().getFurnitureTypeName())
+                .build();
+    }
+
+    public PostRoomResDTO toEntity(Group group){
+        return PostRoomResDTO.builder()
+                .groupName(group.getName())
+                .inviteCode(group.getInviteCode())
                 .build();
     }
 }

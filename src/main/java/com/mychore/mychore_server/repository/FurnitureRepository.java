@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FurnitureRepository extends JpaRepository<Furniture, Long> {
-    List<Furniture> findByFurnitureType(FurnitureType furnitureType);
+    List<Furniture> findByFurnitureTypeAndStatus(FurnitureType furnitureType, String status);
 }

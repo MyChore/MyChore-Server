@@ -42,9 +42,9 @@ public class GroupController {
         return ResponseCustom.OK(groupService.joinGroup(inviteCode, loginStatus.getUserId()));
     }
 
-    @GetMapping("/furniture/{furnitureName}")
-    public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(@PathVariable("furnitureName") String furnitureName){
-        return ResponseCustom.OK(groupService.getFurnitureList(furnitureName));
+    @GetMapping("/furniture")
+    public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(@RequestParam("furnitureTypeName") String furnitureTypeName){
+        return ResponseCustom.OK(groupService.getFurnitureList(furnitureTypeName));
     }
 
     @PostMapping("/{groupId}/furniture")
