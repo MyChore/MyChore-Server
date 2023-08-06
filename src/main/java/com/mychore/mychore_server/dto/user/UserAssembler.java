@@ -4,9 +4,10 @@ import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
 import com.mychore.mychore_server.dto.user.response.GetProfileRes;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.entity.user.UserAgree;
-import com.mychore.mychore_server.exception.user.InvalidNicknameException;
 import com.mychore.mychore_server.global.constants.Gender;
 import com.mychore.mychore_server.global.constants.Provider;
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +55,6 @@ public class UserAssembler {
         String regex = "^[a-zA-Z0-9가-힣_]{1,8}$";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(nickname);
-        if(!m.matches()) throw new InvalidNicknameException();
+        if(!m.matches()) throw new BaseException(BaseResponseCode.INVALID_NICKNAME);
     }
 }

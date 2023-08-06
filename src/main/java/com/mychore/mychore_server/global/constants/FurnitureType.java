@@ -1,5 +1,7 @@
 package com.mychore.mychore_server.global.constants;
 
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -15,6 +17,6 @@ public enum FurnitureType {
     public static FurnitureType getByName(String name){
         return Arrays.stream(FurnitureType.values())
                 .filter(furnitureType -> furnitureType.getFurnitureTypeName().equals(name))
-                .findAny().orElse(null);
+                .findAny().orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_FURNITURE_TYPE));
     }
 }

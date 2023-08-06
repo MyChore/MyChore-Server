@@ -17,18 +17,19 @@ import java.time.LocalTime;
 @Valid
 public class ChoreUpdateReq  {
 
-    @NotNull(message = "담당자를 입력해주세요.")
+    @NotNull(message = "C0006")
     private Long userId;
 
-    @NotNull(message = "가구를 입력해주세요.")
+    @NotNull(message = "G0009")
     private Long roomFurnitureId;
 
-    @NotBlank(message = "집안일 이름을 입력해주세요.")
+    @NotBlank(message = "C0007")
     private String name;
 
+    @NotNull(message = "C0009")
     private Boolean isAcceptNoti;
 
-    @NotNull(message = "시작날짜을 입력해주세요.")
+    @NotNull(message = "C0008")
     private LocalDate startDate;
 
     private LocalDate lastDate;

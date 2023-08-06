@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PatchProfileReq {
-    @NotBlank(message = "닉네임을 입력해주세요.")
+    @NotBlank(message = "U0009")
     private String nickname;
     private String gender;
     private String birth;

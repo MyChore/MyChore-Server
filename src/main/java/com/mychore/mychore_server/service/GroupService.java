@@ -11,17 +11,15 @@ import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
 import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
-import com.mychore.mychore_server.exception.group.*;
-import com.mychore.mychore_server.exception.user.UserNotFoundException;
 import com.mychore.mychore_server.global.constants.FurnitureType;
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
@@ -49,7 +47,8 @@ public class GroupService {
         Group group = groupRepository.save(
                 groupAssembler.toGroupEntity(inviteCode, reqDTO.getFloorName(), reqDTO.getFloorType()));
 
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         GroupUser groupUser = groupUserRepository.save(
                 groupAssembler.toGroupUserEntity(group, user, OWNER));
 
@@ -78,11 +77,14 @@ public class GroupService {
     }
 
     public Long joinGroup(String inviteCode, Long userId){
-        Group group = groupRepository.findByInviteCodeAndStatus(inviteCode, ACTIVE_STATUS).orElseThrow(InvalidInvitationCodeException::new);
+        Group group = groupRepository.findByInviteCodeAndStatus(inviteCode, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_INVITATION_CODE));
 
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
 
-        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS).ifPresent( m -> {throw new GroupAlreadyExistException();});
+        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
+                .ifPresent( m -> { throw new BaseException(BaseResponseCode.ALREADY_JOIN_GROUP); });
 
         groupUserRepository.save(groupAssembler.toGroupUserEntity(group, user, MEMBER));
         return group.getId();
@@ -92,7 +94,6 @@ public class GroupService {
         List<FurnitureResDTO> resDTO = new ArrayList<>();
 
         FurnitureType furnitureType = FurnitureType.getByName(furnitureName);
-        if(furnitureType==null){ throw new InvalidTypeNameException(); }
         for(Furniture furniture : furnitureRepository.findByFurnitureTypeAndStatus(furnitureType, ACTIVE_STATUS)){
             resDTO.add(groupAssembler.toFurnitureResDto(furniture));
         }
@@ -100,13 +101,16 @@ public class GroupService {
     }
 
     public PostRoomResDTO postRoomDetail(PostRoomReqDTO reqDTO, Long groupId){
-        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
         PostRoomResDTO resDTO = groupAssembler.toPostRoomResDto(group);
 
         for(RoomFurnitureInfoDTO roomInfo : reqDTO.getRoomFurnitureInfoList()){
-            Room room = roomRepository.findById(roomInfo.getRoomId()).orElseThrow(RoomNotFoundException::new);
+            Room room = roomRepository.findById(roomInfo.getRoomId())
+                    .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
             for(FurnitureInfoDTO furnInfo : roomInfo.getFurnitureInfoList()){
-                Furniture furniture = furnitureRepository.findById(furnInfo.getFurnitureId()).orElseThrow(FurnitureNotFoundException::new);
+                Furniture furniture = furnitureRepository.findById(furnInfo.getFurnitureId())
+                        .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_FURNITURE));
                 roomFurnitureRepository.save(groupAssembler.toRoomFurnitureEntity(room, furniture, furnInfo));
             }
         }
@@ -114,9 +118,12 @@ public class GroupService {
     }
 
     public StaticDataResDTO getStaticData(Long groupId, Long userId){
-        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS).orElseThrow(InvalidApproachException::new);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
 
         List<RoomInfoDTO> roomInfoDTOList = new ArrayList<>();
         List<UserInfoDTO> userInfoDTOList = new ArrayList<>();
@@ -132,7 +139,6 @@ public class GroupService {
             }
             roomInfoDTOList.add(new RoomInfoDTO(room, furnitureInfoDTOList));
         }
-
 
         return new StaticDataResDTO(group, userInfoDTOList, roomInfoDTOList);
     }

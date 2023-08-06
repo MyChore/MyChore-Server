@@ -16,23 +16,25 @@ import java.time.LocalTime;
 @Valid
 public class ChoreCreateReq {
 
-    @NotNull(message = "담당자를 입력해주세요.")
+    @NotNull(message = "C0006")
     private Long userId;
 
-    @NotNull(message = "가구를 입력해주세요.")
+    @NotNull(message = "G0009")
     private Long roomFurnitureId;
 
-    @NotNull(message = "그룹을 입력해주세요.")
+    @NotNull(message = "G0008")
     private Long groupId;
 
-    @NotNull(message = "집안일 이름을 입력해주세요.")
+    @NotNull(message = "C0007")
     private String name;
 
-    @NotNull(message = "시작날짜를 입력해주세요.")
+    @NotNull(message = "C0008")
     private LocalDate startDate;
 
     private LocalDate lastDate;
     private Repetition repetition;
+
+    @NotNull(message = "C0009")
     private Boolean isAcceptNoti;
     private LocalTime notiTime;
 

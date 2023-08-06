@@ -1,11 +1,12 @@
 package com.mychore.mychore_server.controller;
 
-import com.mychore.mychore_server.dto.ResponseCustom;
+import com.mychore.mychore_server.dto.BaseResponse;
 import com.mychore.mychore_server.dto.user.request.PatchProfileReq;
 import com.mychore.mychore_server.dto.user.request.UserLogInReq;
 import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
 import com.mychore.mychore_server.dto.user.response.GetProfileRes;
 import com.mychore.mychore_server.dto.user.response.UserTokenRes;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.global.resolver.Auth;
 import com.mychore.mychore_server.global.resolver.IsLogin;
 import com.mychore.mychore_server.global.resolver.LoginStatus;
@@ -23,59 +24,59 @@ public class UserController {
 
     // 회원가입
     @PostMapping
-    public ResponseCustom<UserTokenRes> signUp(@RequestBody @Valid UserSignUpReq userSignUpReq){
-        return ResponseCustom.OK(userService.signUp(userSignUpReq));
+    public BaseResponse<UserTokenRes> signUp(@RequestBody @Valid UserSignUpReq userSignUpReq){
+        return new BaseResponse<>(userService.signUp(userSignUpReq));
     }
 
     // 로그인
     @PostMapping("/login")
-    public ResponseCustom<UserTokenRes> logIn(@RequestBody @Valid UserLogInReq userLogInReq){
-        return ResponseCustom.OK(userService.login(userLogInReq));
+    public BaseResponse<UserTokenRes> logIn(@RequestBody @Valid UserLogInReq userLogInReq){
+        return new BaseResponse<>(userService.login(userLogInReq));
     }
 
     // 로그아웃
     @Auth
     @PatchMapping("/logout")
-    public ResponseCustom<Void> logOut(@IsLogin LoginStatus loginStatus){
+    public BaseResponse<Void> logOut(@IsLogin LoginStatus loginStatus){
         userService.logout(loginStatus.getUserId());
-        return ResponseCustom.OK();
+        return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
     // 회원탈퇴
     @Auth
     @DeleteMapping
-    public ResponseCustom<Void> withdraw(@IsLogin LoginStatus loginStatus){
+    public BaseResponse<Void> withdraw(@IsLogin LoginStatus loginStatus){
         userService.withdraw(loginStatus.getUserId());
-        return ResponseCustom.OK();
+        return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
     // 프로필 조회
     @Auth
     @GetMapping
-    public ResponseCustom<GetProfileRes> getProfile(@IsLogin LoginStatus loginStatus){
-        return ResponseCustom.OK(userService.getProfile(loginStatus.getUserId()));
+    public BaseResponse<GetProfileRes> getProfile(@IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(userService.getProfile(loginStatus.getUserId()));
     }
 
     // 프로필 수정
     @Auth
     @PatchMapping
-    public ResponseCustom<Void> editProfile(@RequestBody @Valid PatchProfileReq patchProfileReq,
-                                                    @IsLogin LoginStatus loginStatus){
+    public BaseResponse<Void> editProfile(@RequestBody @Valid PatchProfileReq patchProfileReq,
+                                          @IsLogin LoginStatus loginStatus){
         userService.editProfile(loginStatus.getUserId(), patchProfileReq);
-        return ResponseCustom.OK();
+        return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
     // 알림 설정 수정
     @Auth
     @PatchMapping("/noti")
-    public ResponseCustom<Void> editNotiAgree(String type, @IsLogin LoginStatus loginStatus){
+    public BaseResponse<Void> editNotiAgree(@RequestParam String type, @IsLogin LoginStatus loginStatus){
         userService.editNotiAgree(loginStatus.getUserId(), type);
-        return ResponseCustom.OK();
+        return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
     // 가입 전 닉네임 중복 확인
     @GetMapping("check-nickname")
-    public ResponseCustom<Boolean> checkNickname(String nickname){
-        return ResponseCustom.OK(userService.checkNicknameWithSignUp(nickname));
+    public BaseResponse<Boolean> checkNickname(@RequestParam String nickname){
+        return new BaseResponse<>(userService.checkNicknameWithSignUp(nickname));
     }
 }

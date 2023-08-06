@@ -1,6 +1,7 @@
 package com.mychore.mychore_server.global.constants;
 
-import com.mychore.mychore_server.exception.user.WrongGenderException;
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -17,6 +18,6 @@ public enum Gender {
     public static Gender getByName(String name){
         return Arrays.stream(Gender.values())
                 .filter(gender -> gender.getGenderName().equals(name))
-                .findAny().orElseThrow(WrongGenderException::new);
+                .findAny().orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_GENDER));
     }
 }
