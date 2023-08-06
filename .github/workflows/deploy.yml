@@ -78,7 +78,7 @@ jobs:
       # run: aws s3 cp --region ap-northeast-2 ./$ZIP_FILE_NAME.zip s3://$S3_BUCKET_NAME/
       run: |
         aws deploy push \
-          --application-name $CODE_DEPLOY_NAME \
+          --application-name $CODEDEPLOY_NAME \
           --ignore-hidden-files \
           --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
           --source .
@@ -94,7 +94,7 @@ jobs:
       #   --application-name $CODEDEPLOY_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODEDEPLOY_GROUP --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$ZIP_FILE_NAME.zip
       run: |
         aws deploy create-deployment \
-          --application-name $CODE_DEPLOY_NAME \
+          --application-name $CODEDEPLOY_NAME \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name $CODE_DEPLOY_GROUP \
+          --deployment-group-name $CODEDEPLOY_GROUP \
           --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
