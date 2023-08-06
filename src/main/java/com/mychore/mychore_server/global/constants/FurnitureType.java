@@ -8,13 +8,13 @@ import java.util.Arrays;
 public enum FurnitureType {
     RELAX("휴식"), STORAGE("책상,수납"), KITCHEN("부엌"), BATHROOM("욕실"), ETC("기타");
 
-    private final String furnitureName;
+    private final String furnitureTypeName;
 
-    FurnitureType(String furnitureName) { this.furnitureName = furnitureName; }
+    FurnitureType(String furnitureTypeName) { this.furnitureTypeName = furnitureTypeName; }
 
     public static FurnitureType getByName(String name){
         return Arrays.stream(FurnitureType.values())
-                .filter(furnitureType -> furnitureType.getFurnitureName().equals(name))
+                .filter(furnitureType -> furnitureType.getFurnitureTypeName().equals(name))
                 .findAny().orElse(null);
     }
 }

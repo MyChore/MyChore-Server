@@ -53,7 +53,7 @@ public class GroupService {
         GroupUser groupUser = groupUserRepository.save(
                 groupAssembler.toEntity(group, user, OWNER));
 
-        PostGroupResDTO resDTO = new PostGroupResDTO(group.getId(), inviteCode, groupUser.getId());
+        PostGroupResDTO resDTO = groupAssembler.toEntity(group.getId(), inviteCode, groupUser.getId());
 
         List<Long> roomIdList = new ArrayList<>();
         for(RoomInfoDTO roomInfoDTO : reqDTO.getRooms()){
@@ -93,15 +93,15 @@ public class GroupService {
 
         FurnitureType furnitureType = FurnitureType.getByName(furnitureName);
         if(furnitureType==null){ throw new InvalidTypeNameException(); }
-        for(Furniture furniture : furnitureRepository.findByFurnitureType(furnitureType)){
-            resDTO.add(new FurnitureResDTO(furniture));
+        for(Furniture furniture : furnitureRepository.findByFurnitureTypeAndStatus(furnitureType, ACTIVE_STATUS)){
+            resDTO.add(GroupAssembler.toEntity(furniture));
         }
         return resDTO;
     }
 
     public PostRoomResDTO postRoomDetail(PostRoomReqDTO reqDTO, Long groupId){
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
-        PostRoomResDTO resDTO = new PostRoomResDTO(group.getName(), group.getInviteCode());
+        PostRoomResDTO resDTO = groupAssembler.toEntity(group);
 
         for(RoomFurnitureInfoDTO roomInfo : reqDTO.getRoomFurnitureInfoList()){
             Room room = roomRepository.findById(roomInfo.getRoomId()).orElseThrow(RoomNotFoundException::new);
