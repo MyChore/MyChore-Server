@@ -10,6 +10,7 @@ import java.util.List;
 
 @Getter
 public class RoomInfoDTO {
+    private Long roomId;
     private Integer sizeX;
     private Integer sizeY;
     private Integer locationX;
@@ -21,6 +22,7 @@ public class RoomInfoDTO {
 
     @Builder
     public RoomInfoDTO(Room room, List<PlacedFurnitureInfoDTO> furnitureList){
+        this.roomId = room.getId();
         this.sizeX = room.getSizeX();
         this.sizeY = room.getSizeY();
         this.locationX = room.getLocationX();
