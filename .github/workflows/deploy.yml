@@ -2,7 +2,7 @@ name: MyChore server CI/CD
 
 on:
   push:
-    branches: [ hotfix/26-github-action-hotfix ]
+    branches: [ develop ]
 
 env:
   S3_BUCKET_NAME: mychore-deploy
@@ -79,19 +79,14 @@ jobs:
         aws deploy push \
           --application-name $CODEDEPLOY_NAME \
           --ignore-hidden-files \
-          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          --s3-location s3://$S3_BUCKET_NAME/$ZIP_FILE_NAME.zip \
           --source .
 
     # Deploy
     - name: Deploy to AWS EC2 from S3
-      # env:
-      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # run: aws deploy create-deployment \
-      #   --application-name $CODEDEPLOY_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODEDEPLOY_GROUP --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$ZIP_FILE_NAME.zip
       run: |
         aws deploy create-deployment \
           --application-name $CODEDEPLOY_NAME \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name $CODEDEPLOY_GROUP \
-          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+          --s3-location bucket=$S3_BUCKET_NAME,key=$ZIP_FILE_NAME.zip,bundleType=zip
