@@ -13,7 +13,7 @@ public class FurnitureResDTO {
     private Integer sizeY;
     private String name;
     private String imgKey;
-    private FurnitureType furnitureType;
+    private String furnitureName;
 
     @Builder
     public FurnitureResDTO(Furniture furniture){
@@ -22,6 +22,6 @@ public class FurnitureResDTO {
         this.sizeY = furniture.getSizeY();
         this.name = furniture.getName();
         this.imgKey = furniture.getImgKey();
-        this.furnitureType = furniture.getFurnitureType();
+        this.furnitureName = furniture.getFurnitureType().getFurnitureName();
     }
 }

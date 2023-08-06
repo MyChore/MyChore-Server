@@ -20,6 +20,12 @@ public class GroupExceptionController {
         return ResponseCustom.BAD_REQUEST(e.getMessage());
     }
 
+    @ExceptionHandler(InvalidTypeNameException.class)
+    public ResponseCustom<Void> catchInvalidTypeNameException(InvalidTypeNameException e){
+        log.error(e.getMessage());
+        return ResponseCustom.BAD_REQUEST(e.getMessage());
+    }
+
     @ExceptionHandler(GroupNotFoundException.class)
     public ResponseCustom<Void> catchGroupNotFoundException(GroupNotFoundException e){
         log.error(e.getMessage());

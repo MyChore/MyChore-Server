@@ -14,6 +14,7 @@ import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.exception.group.*;
 import com.mychore.mychore_server.exception.user.UserNotFoundException;
+import com.mychore.mychore_server.global.constants.FurnitureType;
 import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -87,9 +88,12 @@ public class GroupService {
         return group.getId();
     }
 
-    public List<FurnitureResDTO> getFurnitureList(){
+    public List<FurnitureResDTO> getFurnitureList(String furnitureName){
         List<FurnitureResDTO> resDTO = new ArrayList<>();
-        for(Furniture furniture : furnitureRepository.findAll()){
+
+        FurnitureType furnitureType = FurnitureType.getByName(furnitureName);
+        if(furnitureType==null){ throw new InvalidTypeNameException(); }
+        for(Furniture furniture : furnitureRepository.findByFurnitureType(furnitureType)){
             resDTO.add(new FurnitureResDTO(furniture));
         }
         return resDTO;
