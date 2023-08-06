@@ -2,7 +2,7 @@ name: MyChore server CI/CD
 
 on:
   push:
-    branches: [ hotfix/26-test ]
+    branches: [ develop ]
   
 
 env:
