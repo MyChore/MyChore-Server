@@ -75,9 +75,10 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # run: aws deploy create-deployment --application-name $CODEDEPLOY_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODEDEPLOY_GROUP --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$ZIP_FILE_NAME.zip
-      run: |
-        aws s3 cp \
-        --region ap-northeast-2 \
-        --acl private \ 
-        ./springboot-intro-build.zip s3://springboot-intro-build/
+      run: aws deploy create-deployment --application-name $CODEDEPLOY_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODEDEPLOY_GROUP --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$ZIP_FILE_NAME.zip
+      # run: |
+      #   aws s3 cp \
+      #   --region ap-northeast-2 \
+      #   --acl private \ 
+      #   ./springboot-intro-build.zip s3://springboot-intro-build/
+      
