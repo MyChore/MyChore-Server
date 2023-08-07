@@ -198,10 +198,13 @@ public class GroupService {
 
     private Group groupOwnerCheck(Long groupId, Long userId){
 //        validation check
-        Group group = validationCheck(groupId, userId);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
 
 //        owner check
-        groupUserRepository.findByGroupAndRoleAndStatus(group, OWNER, ACTIVE_STATUS)
+        groupUserRepository.findByUserAndGroupAndRoleAndStatus(user, group, OWNER, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
 
         return group;
