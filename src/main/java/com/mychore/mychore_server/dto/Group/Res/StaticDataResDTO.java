@@ -23,11 +23,12 @@ public class StaticDataResDTO {
 
 
     @Builder
-    public StaticDataResDTO(Group group, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
-        this.groupName = group.getName();
-        this.floorTypeName = group.getFloorType().getTypeName();
-        this.inviteCode = group.getInviteCode();
-        this.createDate = group.getCreatedAt();
+    public StaticDataResDTO(String groupName, String floorTypeName, String inviteCode,
+                            LocalDateTime createDate, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
+        this.groupName = groupName;
+        this.floorTypeName = floorTypeName;
+        this.inviteCode = inviteCode;
+        this.createDate = createDate;
         this.memberList = memberList;
         this.roomList = roomList;
     }

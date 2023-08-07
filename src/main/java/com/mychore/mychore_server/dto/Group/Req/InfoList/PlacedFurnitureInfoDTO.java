@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class PlacedFurnitureInfoDTO {
+    private Long roomFurnId;
     private Integer locationX;
     private Integer locationY;
     private Integer rotation;
@@ -17,14 +18,17 @@ public class PlacedFurnitureInfoDTO {
     private Integer sizeY;
 
     @Builder
-    public PlacedFurnitureInfoDTO(RoomFurniture roomFurniture){
-        this.locationX = roomFurniture.getLocationX();
-        this.locationY = roomFurniture.getLocationY();
-        this.rotation = roomFurniture.getRotation();
-        this.furnitureId = roomFurniture.getFurniture().getId();
-        this.furnitureName = roomFurniture.getFurniture().getName();
-        this.imgKey = roomFurniture.getFurniture().getImgKey();
-        this.sizeX = roomFurniture.getFurniture().getSizeX();
-        this.sizeY = roomFurniture.getFurniture().getSizeY();
+    public PlacedFurnitureInfoDTO(Long roomFurnId, Integer locationX, Integer locationY,
+                                  Integer rotation, Long furnitureId, String furnitureName,
+                                  String imgKey, Integer sizeX, Integer sizeY){
+        this.roomFurnId = roomFurnId;
+        this.locationX = locationX;
+        this.locationY = locationY;
+        this.rotation = rotation;
+        this.furnitureId = furnitureId;
+        this.furnitureName = furnitureName;
+        this.imgKey = imgKey;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
     }
 }

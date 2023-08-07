@@ -10,13 +10,13 @@ public enum RoomType {
     LIVING_ROOM("거실"),
     ROOM("방");
 
-    private final String roomName;
+    private final String roomTypeName;
 
-    RoomType (String roomName) { this.roomName = roomName; }
+    RoomType (String roomTypeName) { this.roomTypeName = roomTypeName; }
 
     public static RoomType getByName(String name){
         return Arrays.stream(RoomType.values())
-                .filter(roomType -> roomType.getRoomName().equals(name))
+                .filter(roomType -> roomType.getRoomTypeName().equals(name))
                 .findAny().orElse(null);
     }
 }

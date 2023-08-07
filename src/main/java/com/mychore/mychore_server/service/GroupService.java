@@ -6,6 +6,7 @@ import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.*;
+import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FurnitureType;
@@ -32,6 +33,7 @@ public class GroupService {
     private final UserRepository userRepository;
     private final GroupUserRepository groupUserRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
+    private final ChoreRepository choreRepository;
     private final GroupAssembler groupAssembler;
 
     public Furniture addFurniture(AddFurnitureReqDTO reqDTO){
@@ -144,12 +146,12 @@ public class GroupService {
             List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
             List<PlacedFurnitureInfoDTO> furnitureInfoDTOList = new ArrayList<>();
             for(RoomFurniture furniture : furnitureList){
-                furnitureInfoDTOList.add(new PlacedFurnitureInfoDTO(furniture));
+                furnitureInfoDTOList.add(groupAssembler.toPlacedFurnitureInfoDto(furniture));
             }
-            roomInfoDTOList.add(new RoomInfoDTO(room, furnitureInfoDTOList));
+            roomInfoDTOList.add(groupAssembler.toRoomInfoDto(room, furnitureInfoDTOList));
         }
 
-        return new StaticDataResDTO(group, userInfoDTOList, roomInfoDTOList);
+        return groupAssembler.toStaticDataResDto(group, userInfoDTOList, roomInfoDTOList);
     }
 
     private GroupListInfoDTO getGroupInfo(Long groupId, Long userId){
@@ -174,5 +176,22 @@ public class GroupService {
             groupListInfoDTOList.add(groupInfo);
         }
         return groupListInfoDTOList;
+    }
+
+    public List<RoomChoreResDTO> getRoomChoreInfo(Long groupId, Long roomId, Long userId){
+        Group group = validationCheck(groupId, userId);
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
+        List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
+
+        List<RoomChoreResDTO> resDTO = new ArrayList<>();
+        for(RoomFurniture furniture: furnitureList){
+            List<Chore> choreList = choreRepository.findAllByRoomFurnitureAndStatus(furniture, ACTIVE_STATUS);
+            for(Chore chore: choreList){
+                resDTO.add(groupAssembler.toRoomChoreResDto(chore));
+            }
+        }
+
+        return resDTO;
     }
 }

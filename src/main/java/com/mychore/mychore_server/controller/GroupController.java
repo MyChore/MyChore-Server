@@ -44,7 +44,7 @@ public class GroupController {
         return new BaseResponse<>(groupService.getFurnitureList(furnitureTypeName));
     }
 
-    @PostMapping("/{groupId}/furniture")
+    @PostMapping("/{groupId}")
     public BaseResponse<PostRoomResDTO> postRoomDetail(@PathVariable("groupId") Long groupId, @Valid @RequestBody PostRoomReqDTO reqDTO){
         return new BaseResponse<>(groupService.postRoomDetail(reqDTO, groupId));
     }
@@ -59,5 +59,11 @@ public class GroupController {
     @GetMapping
     public BaseResponse<List<GroupListInfoDTO>> getGroupInfoList(@IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.getGroupInfoList(loginStatus.getUserId()));
+    }
+
+    @Auth
+    @GetMapping("/{groupId}/{roomId}")
+    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, loginStatus.getUserId()));
     }
 }
