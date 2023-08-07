@@ -63,8 +63,8 @@ public class GroupController {
     }
 
     @Auth
-    @GetMapping("/{groupId}/rooms/{roomId}/{date}")
-    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @PathVariable("date") LocalDate date, @IsLogin LoginStatus loginStatus){
+    @GetMapping("/{groupId}/rooms/{roomId}")
+    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @RequestParam("date") LocalDate date, @IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, date, loginStatus.getUserId()));
     }
 }
