@@ -201,15 +201,14 @@ public class GroupService {
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
 
 //        owner check
-        groupUserRepository.findByUserAndRoleAndStatus(user, OWNER, ACTIVE_STATUS)
+        groupUserRepository.findByUserAndGroupAndRoleAndStatus(user, group, OWNER, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
 
         return group;
     }
+    
     public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
         Group group = groupOwnerCheck(groupId, userId);
         group.SetName(newName);
