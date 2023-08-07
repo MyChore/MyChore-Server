@@ -56,7 +56,7 @@ public class GroupController {
     }
 
     @Auth
-    @GetMapping("/list")
+    @GetMapping
     public BaseResponse<List<GroupListInfoDTO>> getGroupInfoList(@IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.getGroupInfoList(loginStatus.getUserId()));
     }

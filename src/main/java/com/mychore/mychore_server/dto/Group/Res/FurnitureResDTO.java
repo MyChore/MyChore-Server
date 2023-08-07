@@ -1,10 +1,7 @@
 package com.mychore.mychore_server.dto.Group.Res;
 
-import com.mychore.mychore_server.entity.group.Furniture;
-import com.mychore.mychore_server.global.constants.FurnitureType;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class FurnitureResDTO {
