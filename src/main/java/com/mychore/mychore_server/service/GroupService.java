@@ -195,8 +195,23 @@ public class GroupService {
         return resDTO;
     }
 
+    private Group groupOwnerCheck(Long groupId, Long userId){
+//        validation check
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+
+//        owner check
+        groupUserRepository.findByUserAndRoleAndStatus(user, OWNER, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+
+        return group;
+    }
     public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
-        Group group = validationCheck(groupId, userId);
+        Group group = groupOwnerCheck(groupId, userId);
         group.SetName(newName);
         return getStaticData(groupId, userId);
     }
