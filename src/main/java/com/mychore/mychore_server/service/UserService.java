@@ -8,8 +8,9 @@ import com.mychore.mychore_server.dto.user.response.UserTokenRes;
 import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.entity.user.UserAgree;
-import com.mychore.mychore_server.exception.user.*;
 import com.mychore.mychore_server.global.constants.Provider;
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.global.utils.JwtUtils;
 import com.mychore.mychore_server.repository.UserAgreeRepository;
 import com.mychore.mychore_server.repository.UserRepository;
@@ -33,9 +34,9 @@ public class UserService {
     @Transactional
     public UserTokenRes signUp(UserSignUpReq userSignUpReq) {
         if (userRepository.findByEmailAndStatus(userSignUpReq.getEmail(), ACTIVE_STATUS).isPresent()) {
-            throw new EmailAlreadyExistException();
+            throw new BaseException(BaseResponseCode.ALREADY_EXIST_EMAIL);
         } else if (!checkNicknameWithSignUp(userSignUpReq.getNickname())) {
-            throw new NicknameAlreadyExistException();
+            throw new BaseException(BaseResponseCode.ALREADY_EXIST_NICKNAME);
         } else {
             User user = userRepository.save(userAssembler.toEntity(userSignUpReq));
             userAgreeRepository.save(userAssembler.toEntity(user, userSignUpReq));
@@ -46,50 +47,55 @@ public class UserService {
     // 로그인
     public UserTokenRes login(UserLogInReq userLogInReq){
         User user = userRepository.findByEmailAndProviderAndStatus(userLogInReq.getEmail(), Provider.getByName(userLogInReq.getProvider()), ACTIVE_STATUS)
-                .orElseThrow(EmailNotExistException::new);
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_EMAIL));
         return UserTokenRes.toDto(jwtUtils.createToken(user));
     }
 
     // 로그아웃
     public void logout(Long userId) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         user.removeTokens();
         userRepository.save(user);
     }
 
     // 회원탈퇴
     public void withdraw(Long userId) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         user.withdraw();
         userRepository.save(user);
     }
 
     // 프로필 조회
     public GetProfileRes getProfile(Long userId) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         return userAssembler.toGetProfileDto(user);
     }
 
     // 프로필 수정
     public void editProfile(Long userId, PatchProfileReq patchProfileReq) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         if (checkNicknameWithEdit(patchProfileReq.getNickname(), userId)){
             user.editProfile(patchProfileReq);
             userRepository.save(user);
-        } else throw new NicknameAlreadyExistException();
+        } else throw new BaseException(BaseResponseCode.ALREADY_EXIST_NICKNAME);
     }
 
     // 알림 설정 수정
     @Transactional
     public void editNotiAgree(Long userId, String type) {
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(UserNotFoundException::new);
+        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         switch (type) {
             case CHORE -> userAgree.setIsAgreeChoreNoti(!userAgree.getIsAgreeChoreNoti());
             case DONE_CHORE -> userAgree.setIsAgreeDoneNoti(!userAgree.getIsAgreeDoneNoti());
             case TODAY -> userAgree.setIsAgreeTodayNoti(!userAgree.getIsAgreeTodayNoti());
             case NEW_USER -> userAgree.setIsAgreeNewUserNoti(!userAgree.getIsAgreeNewUserNoti());
             case DELETE -> userAgree.setIsAgreeDeleteNoti(!userAgree.getIsAgreeDeleteNoti());
-            default -> throw new WrongNotiTypeException();
+            default -> throw new BaseException(BaseResponseCode.INVALID_NOTI_TYPE);
         }
     }
 

@@ -1,8 +1,8 @@
 package com.mychore.mychore_server.global.utils;
 
 import com.mychore.mychore_server.entity.user.User;
-import com.mychore.mychore_server.exception.user.TokenExpirationException;
-import com.mychore.mychore_server.exception.user.UserNotFoundException;
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.netty.handler.codec.compression.CompressionException;
@@ -90,7 +90,7 @@ public class JwtUtils {
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         user.updateRefreshToken(tokenType + SPACE + refreshToken);
         userRepository.save(user);
         return tokenType + SPACE + refreshToken;
@@ -136,7 +136,7 @@ public class JwtUtils {
                     .parseClaimsJws(justToken)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new TokenExpirationException();
+            throw new BaseException(BaseResponseCode.EXPIRED_TOKEN);
         }
     }
 
@@ -174,11 +174,11 @@ public class JwtUtils {
     @Transactional
     public String accessExpiration(Long userId) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BaseException(BaseResponseCode.EXPIRED_TOKEN));
         String userRefreshToken = user.getRefreshToken();
-        if (userRefreshToken == null) throw new TokenExpirationException();
+        if (userRefreshToken == null) throw new BaseException(BaseResponseCode.EXPIRED_TOKEN);
         String refreshNickname = getNicknameFromFullToken(userRefreshToken);
-        if (refreshNickname.isEmpty()) throw new TokenExpirationException();
+        if (refreshNickname.isEmpty()) throw new BaseException(BaseResponseCode.EXPIRED_TOKEN);
 
         //토큰이 만료되었을 경우.
         return createAccessToken(userId, refreshNickname);

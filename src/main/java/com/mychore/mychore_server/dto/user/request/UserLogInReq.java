@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class UserLogInReq {
-    @NotBlank(message = "이메일을 입력해주세요.")
+    @NotBlank(message = "U0010")
     private String email;
-    @NotBlank(message = "Provider를 입력해주세요.")
+    @NotBlank(message = "U0011")
     private String provider;
 }

@@ -1,6 +1,7 @@
 package com.mychore.mychore_server.global.resolver;
 
-import com.mychore.mychore_server.exception.user.AuthAnnotationIsNowhereException;
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.global.utils.JwtUtils;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class LoginResolver implements HandlerMethodArgumentResolver{
                                   WebDataBinderFactory binderFactory) {
         Auth auth = parameter.getMethodAnnotation(Auth.class);
 
-        if (auth == null) throw new AuthAnnotationIsNowhereException();
+        if (auth == null) throw new BaseException(BaseResponseCode.AUTH_ANNOTATION_IS_NOWHERE);
 
         String accessToken = webRequest.getHeader(Objects.requireNonNull(env.getProperty("jwt.auth-header")));
         if(accessToken == null || !jwtUtils.isValidToken(jwtUtils.parseJustTokenFromFullToken(accessToken)))

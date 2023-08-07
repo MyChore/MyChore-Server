@@ -7,9 +7,8 @@ import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
 import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
-import com.mychore.mychore_server.dto.ResponseCustom;
+import com.mychore.mychore_server.dto.BaseResponse;
 import com.mychore.mychore_server.entity.group.Furniture;
-import com.mychore.mychore_server.global.constants.FurnitureType;
 import com.mychore.mychore_server.global.resolver.Auth;
 import com.mychore.mychore_server.global.resolver.IsLogin;
 import com.mychore.mychore_server.global.resolver.LoginStatus;
@@ -26,35 +25,35 @@ import java.util.List;
 public class GroupController {
     public final GroupService groupService;
     @PostMapping("/add")
-    public ResponseCustom<Furniture> addFurniture(@Valid @RequestBody AddFurnitureReqDTO reqDTO){
-        return ResponseCustom.OK(groupService.addFurniture(reqDTO));
+    public BaseResponse<Furniture> addFurniture(@Valid @RequestBody AddFurnitureReqDTO reqDTO){
+        return new BaseResponse<>(groupService.addFurniture(reqDTO));
     }
 
     @Auth
     @PostMapping
-    public ResponseCustom<PostGroupResDTO> postGroup(@Valid @RequestBody PostGroupReqDTO reqDTO, @IsLogin LoginStatus loginStatus){
-        return ResponseCustom.OK(groupService.postGroup(reqDTO, loginStatus.getUserId()));
+    public BaseResponse<PostGroupResDTO> postGroup(@Valid @RequestBody PostGroupReqDTO reqDTO, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.postGroup(reqDTO, loginStatus.getUserId()));
     }
 
     @Auth
     @PostMapping("/member/{inviteCode}")
-    public ResponseCustom<Long> joinGroup(@PathVariable("inviteCode") String inviteCode, @IsLogin LoginStatus loginStatus){
-        return ResponseCustom.OK(groupService.joinGroup(inviteCode, loginStatus.getUserId()));
+    public BaseResponse<Long> joinGroup(@PathVariable("inviteCode") String inviteCode, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.joinGroup(inviteCode, loginStatus.getUserId()));
     }
 
     @GetMapping("/furniture")
-    public ResponseCustom<List<FurnitureResDTO>> getFurnitureList(@RequestParam("furnitureTypeName") String furnitureTypeName){
-        return ResponseCustom.OK(groupService.getFurnitureList(furnitureTypeName));
+    public BaseResponse<List<FurnitureResDTO>> getFurnitureList(@RequestParam("furnitureTypeName") String furnitureTypeName){
+        return new BaseResponse<>(groupService.getFurnitureList(furnitureTypeName));
     }
 
     @PostMapping("/{groupId}/furniture")
-    public ResponseCustom<PostRoomResDTO> postRoomDetail(@PathVariable("groupId") Long groupId, @Valid @RequestBody PostRoomReqDTO reqDTO){
-        return ResponseCustom.OK(groupService.postRoomDetail(reqDTO, groupId));
+    public BaseResponse<PostRoomResDTO> postRoomDetail(@PathVariable("groupId") Long groupId, @Valid @RequestBody PostRoomReqDTO reqDTO){
+        return new BaseResponse<>(groupService.postRoomDetail(reqDTO, groupId));
     }
 
     @Auth
     @GetMapping("/{groupId}")
-    public ResponseCustom<StaticDataResDTO> getStaticData(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
-        return ResponseCustom.OK(groupService.getStaticData(groupId, loginStatus.getUserId()));
+    public BaseResponse<StaticDataResDTO> getStaticData(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.getStaticData(groupId, loginStatus.getUserId()));
     }
 }

@@ -8,17 +8,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class UserSignUpReq {
-    @NotBlank(message = "이메일을 입력해주세요.")
+    @NotBlank(message = "U0010")
     private String email;
     private String birth;
     private String gender;
-    @NotBlank(message = "닉네임을 입력해주세요.")
+    @NotBlank(message = "U0009")
     private String nickname;
     private String imgKey;
-    @NotBlank(message = "Provider를 입력해주세요.")
+    @NotBlank(message = "U0011")
     private String provider;
-    @NotNull(message = "만 14세 이상 동의 여부를 입력해주세요.")
+    @NotNull(message = "U0012")
     private Boolean is14Over;
-    @NotNull(message = "이메일 수신 동의 여부를 입력해주세요.")
+    @NotNull(message = "U0013")
     private Boolean isAcceptEmail;
 }
