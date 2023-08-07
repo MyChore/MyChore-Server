@@ -24,13 +24,4 @@ public class FurnitureResDTO {
         this.imgKey = imgKey;
         this.furnitureTypeName = furnitureTypeName;
     }
-
-//    public FurnitureResDTO(Furniture furniture){
-//        this.furnitureId = furniture.getId();
-//        this.sizeX = furniture.getSizeX();
-//        this.sizeY = furniture.getSizeY();
-//        this.name = furniture.getName();
-//        this.imgKey = furniture.getImgKey();
-//        this.furnitureName = furniture.getFurnitureType().getFurnitureTypeName();
-//    }
 }

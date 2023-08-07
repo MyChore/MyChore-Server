@@ -1,12 +1,10 @@
 package com.mychore.mychore_server.controller;
 
 import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.GroupListInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
-import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
-import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
-import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
-import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
+import com.mychore.mychore_server.dto.Group.Res.*;
 import com.mychore.mychore_server.dto.BaseResponse;
 import com.mychore.mychore_server.entity.group.Furniture;
 import com.mychore.mychore_server.global.resolver.Auth;
@@ -55,5 +53,11 @@ public class GroupController {
     @GetMapping("/{groupId}")
     public BaseResponse<StaticDataResDTO> getStaticData(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.getStaticData(groupId, loginStatus.getUserId()));
+    }
+
+    @Auth
+    @GetMapping("/list")
+    public BaseResponse<List<GroupListInfoDTO>> getGroupInfoList(@IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.getGroupInfoList(loginStatus.getUserId()));
     }
 }

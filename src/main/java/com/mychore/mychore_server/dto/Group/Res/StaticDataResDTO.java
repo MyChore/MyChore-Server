@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 public class StaticDataResDTO {
     String groupName;
-    String floorName;
+    String floorTypeName;
     String inviteCode;
     LocalDateTime createDate;
     List<UserInfoDTO> memberList;
@@ -25,7 +25,7 @@ public class StaticDataResDTO {
     @Builder
     public StaticDataResDTO(Group group, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
         this.groupName = group.getName();
-        this.floorName = group.getFloorType().getTypeName();
+        this.floorTypeName = group.getFloorType().getTypeName();
         this.inviteCode = group.getInviteCode();
         this.createDate = group.getCreatedAt();
         this.memberList = memberList;
