@@ -5,6 +5,7 @@ import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
+import com.mychore.mychore_server.dto.Group.Req.UpdateRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.*;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.group.*;
@@ -179,7 +180,7 @@ public class GroupService {
     }
 
     public List<RoomChoreResDTO> getRoomChoreInfo(Long groupId, Long roomId, Long userId){
-        Group group = validationCheck(groupId, userId);
+        validationCheck(groupId, userId);
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
         List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
@@ -197,22 +198,42 @@ public class GroupService {
 
     private Group groupOwnerCheck(Long groupId, Long userId){
 //        validation check
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+        Group group = validationCheck(groupId, userId);
 
 //        owner check
-        groupUserRepository.findByUserAndRoleAndStatus(user, OWNER, ACTIVE_STATUS)
+        groupUserRepository.findByGroupAndRoleAndStatus(group, OWNER, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
 
         return group;
     }
+
     public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
         Group group = groupOwnerCheck(groupId, userId);
         group.SetName(newName);
         return getStaticData(groupId, userId);
     }
+
+    public StaticDataResDTO updateGroupFurniture(Long groupId, UpdateRoomReqDTO reqDTO, Long userId){
+        groupOwnerCheck(groupId, userId);
+
+        for(UpdateRoomFurnitureInfoDTO roomFurnitureInfo: reqDTO.getRoomFurnitureInfoList()){
+            Room room = roomRepository.findById(roomFurnitureInfo.getRoomId())
+                    .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
+            for(UpdateFurnitureInfoDTO furnitureInfo: roomFurnitureInfo.getFurnitureInfoList()){
+                Furniture furniture = furnitureRepository.findByIdAndStatus(furnitureInfo.getFurnitureId(), ACTIVE_STATUS)
+                        .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_FURNITURE));
+                if(furnitureInfo.getRoomFurnId() == -1){
+                    roomFurnitureRepository.save(groupAssembler.toRoomFurnitureEntity(room, furniture, furnitureInfo));
+                }
+                else{
+                    RoomFurniture roomFurniture = roomFurnitureRepository.findRoomFurnitureByIdAndStatus(furnitureInfo.getRoomFurnId(), ACTIVE_STATUS)
+                            .orElseThrow(() -> new BaseException(BaseResponseCode.BAD_REQUEST));
+                    roomFurniture.SetNewInfo(furnitureInfo);
+                    roomFurnitureRepository.save(roomFurniture);
+                }
+            }
+        }
+        return getStaticData(groupId, userId);
+    }
+
 }

@@ -64,6 +64,16 @@ public class GroupAssembler {
                 .build();
     }
 
+    public RoomFurniture toRoomFurnitureEntity(Room room, Furniture furniture, UpdateFurnitureInfoDTO furnInfoDTO){
+        return RoomFurniture.builder()
+                .room(room)
+                .furniture(furniture)
+                .locationX(furnInfoDTO.getLocationX())
+                .locationY(room.getLocationY())
+                .rotation(furnInfoDTO.getRotation())
+                .build();
+    }
+
     public PostGroupResDTO toPostGroupResDto(Long groupId, String inviteCode, Long groupUserId){
         return PostGroupResDTO.builder()
                 .groupId(groupId)
