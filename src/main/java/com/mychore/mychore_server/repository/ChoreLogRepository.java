@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ChoreLogRepository extends JpaRepository<ChoreLog, Long> {
 
@@ -13,5 +14,7 @@ public interface ChoreLogRepository extends JpaRepository<ChoreLog, Long> {
 
     List<ChoreLog> findAllBySetDateAndStatus(LocalDate setDate, String status);
     List<ChoreLog> findChoreLogsByChore(Chore chore);
+
+    Optional<ChoreLog> findByChore(Chore chore);
 
 }

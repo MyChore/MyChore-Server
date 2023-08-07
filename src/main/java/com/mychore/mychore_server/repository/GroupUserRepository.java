@@ -18,6 +18,7 @@ public interface GroupUserRepository extends JpaRepository<GroupUser, Long> {
     Optional<GroupUser> findByUserAndGroupAndRoleAndStatus(User user, Group group, Role role, String status);
 
     Optional<GroupUser> findGroupUserByUserAndGroupAndStatus(User user, Group group, String status);
+    List<GroupUser> findGroupUsersByGroup(Group group);
 
 
 }
