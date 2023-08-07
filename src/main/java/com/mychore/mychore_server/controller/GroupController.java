@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -62,8 +63,8 @@ public class GroupController {
     }
 
     @Auth
-    @GetMapping("/{groupId}/rooms/{roomId}")
-    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @IsLogin LoginStatus loginStatus){
-        return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, loginStatus.getUserId()));
+    @GetMapping("/{groupId}/rooms/{roomId}/{date}")
+    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @PathVariable("date") LocalDate date, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, date, loginStatus.getUserId()));
     }
 }
