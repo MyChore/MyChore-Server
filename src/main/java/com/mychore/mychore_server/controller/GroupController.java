@@ -12,7 +12,9 @@ import com.mychore.mychore_server.global.resolver.IsLogin;
 import com.mychore.mychore_server.global.resolver.LoginStatus;
 import com.mychore.mychore_server.service.GroupService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,5 +67,11 @@ public class GroupController {
     @GetMapping("/{groupId}/{roomId}")
     public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, loginStatus.getUserId()));
+    }
+
+    @Auth
+    @PatchMapping("/{groupId}")
+    public BaseResponse<StaticDataResDTO> updateGroupName(@PathVariable("groupId") Long groupId, @RequestParam("newName") String newName, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.updateGroupName(groupId, newName, loginStatus.getUserId()));
     }
 }

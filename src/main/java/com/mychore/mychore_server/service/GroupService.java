@@ -194,4 +194,10 @@ public class GroupService {
 
         return resDTO;
     }
+
+    public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
+        Group group = validationCheck(groupId, userId);
+        group.SetName(newName);
+        return getStaticData(groupId, userId);
+    }
 }

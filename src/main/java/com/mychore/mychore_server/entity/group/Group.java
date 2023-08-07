@@ -41,4 +41,6 @@ public class Group extends BaseEntity {
     public void SetId(Long groupId){
         this.id = groupId;
     }
+
+    public void SetName(String name) { this.name = name; }
 }
