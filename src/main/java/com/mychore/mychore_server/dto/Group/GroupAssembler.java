@@ -64,6 +64,16 @@ public class GroupAssembler {
                 .build();
     }
 
+    public RoomFurniture toRoomFurnitureEntity(Room room, Furniture furniture, UpdateFurnitureInfoDTO furnInfoDTO){
+        return RoomFurniture.builder()
+                .room(room)
+                .furniture(furniture)
+                .locationX(furnInfoDTO.getLocationX())
+                .locationY(room.getLocationY())
+                .rotation(furnInfoDTO.getRotation())
+                .build();
+    }
+
     public PostGroupResDTO toPostGroupResDto(Long groupId, String inviteCode, Long groupUserId){
         return PostGroupResDTO.builder()
                 .groupId(groupId)
@@ -123,8 +133,8 @@ public class GroupAssembler {
                 .build();
     }
 
-    public RoomInfoDTO toRoomInfoDto(Room room, List<PlacedFurnitureInfoDTO> furnitureList){
-        return RoomInfoDTO.builder()
+    public GetRoomInfoDTO toGetRoomInfoDto(Room room, List<PlacedFurnitureInfoDTO> furnitureList){
+        return GetRoomInfoDTO.builder()
                 .roomId(room.getId())
                 .sizeX(room.getSizeX())
                 .sizeY(room.getSizeY())
@@ -136,7 +146,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public StaticDataResDTO toStaticDataResDto(Group group, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
+    public StaticDataResDTO toStaticDataResDto(Group group, List<UserInfoDTO> memberList, List<GetRoomInfoDTO> roomList){
         return StaticDataResDTO.builder()
                 .groupName(group.getName())
                 .floorTypeName(group.getFloorType().getTypeName())

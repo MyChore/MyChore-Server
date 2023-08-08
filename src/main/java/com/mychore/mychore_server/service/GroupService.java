@@ -5,6 +5,7 @@ import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
+import com.mychore.mychore_server.dto.Group.Req.UpdateRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.*;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
@@ -46,12 +47,13 @@ public class GroupService {
     }
 
     public PostGroupResDTO postGroup(PostGroupReqDTO reqDTO, Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+
         String inviteCode = createInviteCode();
         Group group = groupRepository.save(
                 groupAssembler.toGroupEntity(inviteCode, reqDTO.getFloorName(), reqDTO.getFloorType()));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         GroupUser groupUser = groupUserRepository.save(
                 groupAssembler.toGroupUserEntity(group, user, OWNER));
 
@@ -109,7 +111,7 @@ public class GroupService {
         PostRoomResDTO resDTO = groupAssembler.toPostRoomResDto(group);
 
         for(RoomFurnitureInfoDTO roomInfo : reqDTO.getRoomFurnitureInfoList()){
-            Room room = roomRepository.findById(roomInfo.getRoomId())
+            Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomInfo.getRoomId(), group, ACTIVE_STATUS)
                     .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
             for(FurnitureInfoDTO furnInfo : roomInfo.getFurnitureInfoList()){
                 Furniture furniture = furnitureRepository.findById(furnInfo.getFurnitureId())
@@ -144,7 +146,7 @@ public class GroupService {
 
         List<UserInfoDTO> userInfoDTOList = getUserInfoList(group);
 
-        List<RoomInfoDTO> roomInfoDTOList = new ArrayList<>();
+        List<GetRoomInfoDTO> roomInfoDTOList = new ArrayList<>();
         List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
         for(Room room: roomList){
             List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
@@ -152,7 +154,7 @@ public class GroupService {
             for(RoomFurniture furniture : furnitureList){
                 furnitureInfoDTOList.add(groupAssembler.toPlacedFurnitureInfoDto(furniture));
             }
-            roomInfoDTOList.add(groupAssembler.toRoomInfoDto(room, furnitureInfoDTOList));
+            roomInfoDTOList.add(groupAssembler.toGetRoomInfoDto(room, furnitureInfoDTOList));
         }
 
         return groupAssembler.toStaticDataResDto(group, userInfoDTOList, roomInfoDTOList);
@@ -181,6 +183,7 @@ public class GroupService {
         }
         return groupListInfoDTOList;
     }
+
 
     public List<RoomChoreResDTO> getRoomChoreInfo(Long groupId, Long roomId, LocalDate date, Long userId){
         validationCheck(groupId, userId);
@@ -218,10 +221,34 @@ public class GroupService {
 
         return group;
     }
-    
+
     public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
         Group group = groupOwnerCheck(groupId, userId);
         group.SetName(newName);
         return getStaticData(groupId, userId);
     }
+
+    public StaticDataResDTO updateGroupFurniture(Long groupId, UpdateRoomReqDTO reqDTO, Long userId){
+        Group group = groupOwnerCheck(groupId, userId);
+
+        for(UpdateRoomFurnitureInfoDTO roomFurnitureInfo: reqDTO.getRoomFurnitureInfoList()){
+            Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomFurnitureInfo.getRoomId(), group, ACTIVE_STATUS)
+                    .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
+            for(UpdateFurnitureInfoDTO furnitureInfo: roomFurnitureInfo.getFurnitureInfoList()){
+                Furniture furniture = furnitureRepository.findByIdAndStatus(furnitureInfo.getFurnitureId(), ACTIVE_STATUS)
+                        .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_FURNITURE));
+                if(furnitureInfo.getRoomFurnId() == null){
+                    roomFurnitureRepository.save(groupAssembler.toRoomFurnitureEntity(room, furniture, furnitureInfo));
+                }
+                else{
+                    RoomFurniture roomFurniture = roomFurnitureRepository.findRoomFurnitureByIdAndStatus(furnitureInfo.getRoomFurnId(), ACTIVE_STATUS)
+                            .orElseThrow(() -> new BaseException(BaseResponseCode.BAD_REQUEST));
+                    roomFurniture.SetNewInfo(furnitureInfo);
+                    roomFurnitureRepository.save(roomFurniture);
+                }
+            }
+        }
+        return getStaticData(groupId, userId);
+    }
+
 }

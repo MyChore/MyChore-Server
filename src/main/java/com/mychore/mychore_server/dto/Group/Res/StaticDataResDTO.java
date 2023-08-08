@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.dto.Group.Res;
 
+import com.mychore.mychore_server.dto.Group.Req.InfoList.GetRoomInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.UserInfoDTO;
 import com.mychore.mychore_server.entity.group.Group;
@@ -19,12 +20,12 @@ public class StaticDataResDTO {
     String inviteCode;
     LocalDateTime createDate;
     List<UserInfoDTO> memberList;
-    List<RoomInfoDTO> roomList;
+    List<GetRoomInfoDTO> roomList;
 
 
     @Builder
     public StaticDataResDTO(String groupName, String floorTypeName, String inviteCode,
-                            LocalDateTime createDate, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
+                            LocalDateTime createDate, List<UserInfoDTO> memberList, List<GetRoomInfoDTO> roomList){
         this.groupName = groupName;
         this.floorTypeName = floorTypeName;
         this.inviteCode = inviteCode;

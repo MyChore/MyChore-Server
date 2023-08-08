@@ -4,6 +4,7 @@ import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.GroupListInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
+import com.mychore.mychore_server.dto.Group.Req.UpdateRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Res.*;
 import com.mychore.mychore_server.dto.BaseResponse;
 import com.mychore.mychore_server.entity.group.Furniture;
@@ -74,5 +75,11 @@ public class GroupController {
     @PatchMapping("/{groupId}")
     public BaseResponse<StaticDataResDTO> updateGroupName(@PathVariable("groupId") Long groupId, @RequestParam("newName") String newName, @IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.updateGroupName(groupId, newName, loginStatus.getUserId()));
+    }
+
+    @Auth
+    @PutMapping("/{groupId}")
+    public BaseResponse<StaticDataResDTO> updateGroupFurniture(@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateRoomReqDTO reqDTO, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.updateGroupFurniture(groupId, reqDTO, loginStatus.getUserId()));
     }
 }
