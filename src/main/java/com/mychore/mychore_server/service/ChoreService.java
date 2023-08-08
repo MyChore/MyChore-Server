@@ -106,6 +106,22 @@ public class ChoreService {
         choreEntity.setStatus(Constant.INACTIVE_STATUS);
     }
 
+    public int getChoreCompletionRate(Long userId, Long groupId, Long roomId,
+                                          LocalDate fromTime, LocalDate toTime, Long loginUserId) {
+
+        isGroupMember(groupId, loginUserId);
+        isValidfindChoresParameter(userId, groupId, roomId, fromTime, toTime);
+
+        List<ChoreDetailResp> chores = choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
+
+        int count = 0;
+        for (ChoreDetailResp chore : chores) {
+            if (chore.getCompleteStatus()==true) count++;
+        }
+
+        return count * 100 / chores.size();
+    }
+
 
     // 엔티티 검증 로직
     public User findUserEntity(Long userId) {

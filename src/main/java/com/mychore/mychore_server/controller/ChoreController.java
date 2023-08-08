@@ -53,6 +53,17 @@ public class ChoreController {
     }
 
     @Auth
+    @GetMapping("/completion-rate")
+    public BaseResponse<Integer> getChoresCompletionRateAPI(
+            @RequestParam(required = false) Long userId,
+            @RequestParam Long groupId,
+            @RequestParam(required = false) Long roomId,
+            @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate,
+            @IsLogin LoginStatus loginStatus) {
+        return new BaseResponse<>(choreService.getChoreCompletionRate(userId, groupId, roomId, fromDate, toDate, loginStatus.getUserId()));
+    }
+
+    @Auth
     @PostMapping("/{choreId}/log")
     public BaseResponse<Void> setChoreLogStatusAPI(
             @PathVariable Long choreId,
