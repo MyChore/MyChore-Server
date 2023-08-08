@@ -10,6 +10,7 @@ import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.global.resolver.Auth;
 import com.mychore.mychore_server.global.resolver.IsLogin;
 import com.mychore.mychore_server.global.resolver.LoginStatus;
+import com.mychore.mychore_server.global.utils.JwtUtils;
 import com.mychore.mychore_server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtils jwtUtils;
+
+    // 토큰 재발급
+    @Auth
+    @GetMapping("/token")
+    public BaseResponse<String> signUp(@IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(jwtUtils.accessExpiration(loginStatus.getUserId()));
+    }
 
     // 회원가입
     @PostMapping
