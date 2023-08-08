@@ -23,7 +23,7 @@ public class UserAssembler {
     public User toEntity(UserSignUpReq userSignUpReq){
         return User.builder()
                 .email(userSignUpReq.getEmail())
-                .imgKey(userSignUpReq.getImgKey())
+                .imgUrl(userSignUpReq.getImgUrl())
                 .nickname(userSignUpReq.getNickname())
                 .gender(Gender.getByName(userSignUpReq.getGender()))
                 .birth(LocalDate.parse(userSignUpReq.getBirth()))
@@ -43,7 +43,7 @@ public class UserAssembler {
         return GetProfileRes.builder()
                 .nickname(user.getNickname())
                 .email(user.getEmail())
-                .imgKey(user.getImgKey())
+                .imgUrl(user.getImgUrl())
                 .gender(user.getGender().getGenderName())
                 .birth(user.getBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .build();

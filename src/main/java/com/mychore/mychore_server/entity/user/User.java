@@ -40,7 +40,7 @@ public class User extends BaseEntity {
 
     private LocalDate birth;
 
-    private String imgKey;
+    private String imgUrl;
 
     @NonNull
     @Enumerated(EnumType.STRING)
@@ -49,12 +49,12 @@ public class User extends BaseEntity {
     private String refreshToken;
 
     @Builder
-    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgKey, @NonNull Provider provider) {
+    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgUrl, @NonNull Provider provider) {
         this.email = email;
         this.nickname = nickname;
         this.gender = gender;
         this.birth = birth;
-        this.imgKey = imgKey;
+        this.imgUrl = imgUrl;
         this.provider = provider;
     }
 
@@ -75,8 +75,8 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void editImgKey(String imgKey) {
-        this.imgKey = imgKey;
+    public void editImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 
     public void updateRefreshToken(String refreshToken){
