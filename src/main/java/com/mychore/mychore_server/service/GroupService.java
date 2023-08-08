@@ -225,7 +225,7 @@ public class GroupService {
             for(UpdateFurnitureInfoDTO furnitureInfo: roomFurnitureInfo.getFurnitureInfoList()){
                 Furniture furniture = furnitureRepository.findByIdAndStatus(furnitureInfo.getFurnitureId(), ACTIVE_STATUS)
                         .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_FURNITURE));
-                if(furnitureInfo.getRoomFurnId() == -1){
+                if(furnitureInfo.getRoomFurnId() == null){
                     roomFurnitureRepository.save(groupAssembler.toRoomFurnitureEntity(room, furniture, furnitureInfo));
                 }
                 else{

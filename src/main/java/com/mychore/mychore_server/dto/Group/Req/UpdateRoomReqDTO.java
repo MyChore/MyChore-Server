@@ -2,6 +2,7 @@ package com.mychore.mychore_server.dto.Group.Req;
 
 import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomFurnitureInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.UpdateRoomFurnitureInfoDTO;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 import java.util.List;
