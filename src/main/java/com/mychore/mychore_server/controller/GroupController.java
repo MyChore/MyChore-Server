@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -65,9 +66,9 @@ public class GroupController {
     }
 
     @Auth
-    @GetMapping("/{groupId}/{roomId}")
-    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @IsLogin LoginStatus loginStatus){
-        return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, loginStatus.getUserId()));
+    @GetMapping("/{groupId}/rooms/{roomId}")
+    public BaseResponse<List<RoomChoreResDTO>> getGroupChoreInfo(@PathVariable("groupId") Long groupId, @PathVariable("roomId") Long roomId, @RequestParam("date") LocalDate date, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.getRoomChoreInfo(groupId, roomId, date, loginStatus.getUserId()));
     }
 
     @Auth
