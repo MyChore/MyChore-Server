@@ -2,16 +2,17 @@ package com.mychore.mychore_server.dto.Group.Req;
 
 import com.mychore.mychore_server.global.constants.FurnitureType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class AddFurnitureReqDTO {
-    @NotBlank
+    @NotNull(message = "GL006")
     private String name;
-    @NotBlank
+    @NotNull(message = "GL006")
     private Integer sizeX;
-    @NotBlank
+    @NotNull(message = "GL006")
     private Integer sizeY;
-    @NotBlank
+    @NotNull(message = "GL006")
     private FurnitureType furnitureType;
 }

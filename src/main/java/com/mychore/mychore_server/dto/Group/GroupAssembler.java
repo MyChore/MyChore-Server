@@ -133,8 +133,8 @@ public class GroupAssembler {
                 .build();
     }
 
-    public RoomInfoDTO toRoomInfoDto(Room room, List<PlacedFurnitureInfoDTO> furnitureList){
-        return RoomInfoDTO.builder()
+    public GetRoomInfoDTO toGetRoomInfoDto(Room room, List<PlacedFurnitureInfoDTO> furnitureList){
+        return GetRoomInfoDTO.builder()
                 .roomId(room.getId())
                 .sizeX(room.getSizeX())
                 .sizeY(room.getSizeY())
@@ -146,7 +146,7 @@ public class GroupAssembler {
                 .build();
     }
 
-    public StaticDataResDTO toStaticDataResDto(Group group, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
+    public StaticDataResDTO toStaticDataResDto(Group group, List<UserInfoDTO> memberList, List<GetRoomInfoDTO> roomList){
         return StaticDataResDTO.builder()
                 .groupName(group.getName())
                 .floorTypeName(group.getFloorType().getTypeName())
