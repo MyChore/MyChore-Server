@@ -1,13 +1,9 @@
 package com.mychore.mychore_server.dto.Group;
 
 import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.UserInfoDTO;
-import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.GroupListInfoDTO;
-import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
-import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
+import com.mychore.mychore_server.dto.Group.Res.*;
+import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FloorType;
@@ -53,7 +49,7 @@ public class GroupAssembler {
                 .sizeY(roomInfoDTO.getSizeY())
                 .locationX(roomInfoDTO.getLocationX())
                 .locationY(roomInfoDTO.getLocationY())
-                .roomType(RoomType.getByName(roomInfoDTO.getRoomName()))
+                .roomType(RoomType.getByName(roomInfoDTO.getRoomTypeName()))
                 .name(group.getName())
                 .build();
     }
@@ -110,6 +106,53 @@ public class GroupAssembler {
                 .groupName(group.getName())
                 .floorTypeName(group.getFloorType().getTypeName())
                 .updateDate(group.getUpdatedAt())
+                .build();
+    }
+
+    public PlacedFurnitureInfoDTO toPlacedFurnitureInfoDto(RoomFurniture furniture){
+        return PlacedFurnitureInfoDTO.builder()
+                .roomFurnId(furniture.getId())
+                .locationX(furniture.getLocationX())
+                .locationY(furniture.getLocationY())
+                .rotation(furniture.getRotation())
+                .furnitureId(furniture.getFurniture().getId())
+                .furnitureName(furniture.getFurniture().getName())
+                .imgKey(furniture.getFurniture().getImgKey())
+                .sizeX(furniture.getFurniture().getSizeX())
+                .sizeY(furniture.getFurniture().getSizeY())
+                .build();
+    }
+
+    public RoomInfoDTO toRoomInfoDto(Room room, List<PlacedFurnitureInfoDTO> furnitureList){
+        return RoomInfoDTO.builder()
+                .roomId(room.getId())
+                .sizeX(room.getSizeX())
+                .sizeY(room.getSizeY())
+                .locationX(room.getLocationX())
+                .locationY(room.getLocationY())
+                .roomTypeName(room.getRoomType().getRoomTypeName())
+                .name(room.getName())
+                .furnitureList(furnitureList)
+                .build();
+    }
+
+    public StaticDataResDTO toStaticDataResDto(Group group, List<UserInfoDTO> memberList, List<RoomInfoDTO> roomList){
+        return StaticDataResDTO.builder()
+                .groupName(group.getName())
+                .floorTypeName(group.getFloorType().getTypeName())
+                .inviteCode(group.getInviteCode())
+                .createDate(group.getCreatedAt())
+                .memberList(memberList)
+                .roomList(roomList)
+                .build();
+    }
+
+    public RoomChoreResDTO toRoomChoreResDto(Chore chore){
+        return RoomChoreResDTO.builder()
+                .choreId(chore.getId())
+                .roomFurnitureId(chore.getRoomFurniture().getId())
+                .userId(chore.getUser().getId())
+                .name(chore.getName())
                 .build();
     }
 }
