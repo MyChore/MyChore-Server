@@ -3,7 +3,9 @@ package com.mychore.mychore_server.dto.Group;
 import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.FurnitureInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.UserInfoDTO;
 import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
+import com.mychore.mychore_server.dto.Group.Req.InfoList.GroupListInfoDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
 import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
 import com.mychore.mychore_server.entity.group.*;
@@ -13,6 +15,8 @@ import com.mychore.mychore_server.global.constants.Role;
 import com.mychore.mychore_server.global.constants.RoomType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -87,6 +91,25 @@ public class GroupAssembler {
         return PostRoomResDTO.builder()
                 .groupName(group.getName())
                 .inviteCode(group.getInviteCode())
+                .build();
+    }
+
+    public UserInfoDTO toUserInfoDto(GroupUser member){
+        return UserInfoDTO.builder()
+                .userId(member.getUser().getId())
+                .groupUserId(member.getId())
+                .role(member.getRole())
+                .nickname(member.getUser().getNickname())
+                .imgKey(member.getUser().getImgKey())
+                .build();
+    }
+
+    public GroupListInfoDTO toGroupListInfoDto(Group group){
+        return GroupListInfoDTO.builder()
+                .groupId(group.getId())
+                .groupName(group.getName())
+                .floorTypeName(group.getFloorType().getTypeName())
+                .updateDate(group.getUpdatedAt())
                 .build();
     }
 }

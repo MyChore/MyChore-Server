@@ -14,11 +14,11 @@ public class UserInfoDTO {
     private String imgKey;
 
     @Builder
-    public UserInfoDTO(GroupUser groupUser){
-        this.userId = groupUser.getUser().getId();
-        this.groupUserId = groupUser.getId();
-        this.role = groupUser.getRole();
-        this.nickname = groupUser.getUser().getNickname();
-        this.imgKey = groupUser.getUser().getImgKey();
+    public UserInfoDTO(Long userId, Long groupUserId, Role role, String nickname, String imgKey){
+        this.userId = userId;
+        this.groupUserId = groupUserId;
+        this.role = role;
+        this.nickname = nickname;
+        this.imgKey = imgKey;
     }
 }

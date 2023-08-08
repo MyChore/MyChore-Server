@@ -5,10 +5,7 @@ import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
 import com.mychore.mychore_server.dto.Group.Req.PostRoomReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.PostGroupReqDTO;
-import com.mychore.mychore_server.dto.Group.Res.FurnitureResDTO;
-import com.mychore.mychore_server.dto.Group.Res.PostGroupResDTO;
-import com.mychore.mychore_server.dto.Group.Res.PostRoomResDTO;
-import com.mychore.mychore_server.dto.Group.Res.StaticDataResDTO;
+import com.mychore.mychore_server.dto.Group.Res.*;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FurnitureType;
@@ -117,7 +114,7 @@ public class GroupService {
         return resDTO;
     }
 
-    public StaticDataResDTO getStaticData(Long groupId, Long userId){
+    private Group validationCheck(Long groupId, Long userId){
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
         User user = userRepository.findById(userId)
@@ -125,11 +122,23 @@ public class GroupService {
         groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
 
-        List<RoomInfoDTO> roomInfoDTOList = new ArrayList<>();
-        List<UserInfoDTO> userInfoDTOList = new ArrayList<>();
+        return group;
+    }
 
+    private List<UserInfoDTO> getUserInfoList(Group group){
+        List<UserInfoDTO> userInfoDTOList = new ArrayList<>();
         List<GroupUser> memberList = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
-        for(GroupUser member: memberList) { userInfoDTOList.add(new UserInfoDTO(member)); }
+        for(GroupUser member: memberList) { userInfoDTOList.add(groupAssembler.toUserInfoDto(member)); }
+
+        return userInfoDTOList;
+    }
+
+    public StaticDataResDTO getStaticData(Long groupId, Long userId){
+        Group group = validationCheck(groupId, userId);
+
+        List<UserInfoDTO> userInfoDTOList = getUserInfoList(group);
+
+        List<RoomInfoDTO> roomInfoDTOList = new ArrayList<>();
         List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
         for(Room room: roomList){
             List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
@@ -141,5 +150,29 @@ public class GroupService {
         }
 
         return new StaticDataResDTO(group, userInfoDTOList, roomInfoDTOList);
+    }
+
+    private GroupListInfoDTO getGroupInfo(Long groupId, Long userId){
+        Group group = validationCheck(groupId, userId);
+        GroupListInfoDTO groupInfo = groupAssembler.toGroupListInfoDto(group);
+
+        List<UserInfoDTO> userInfoDTOList = getUserInfoList(group);
+        groupInfo.SetMemberList(userInfoDTOList);
+
+        return groupInfo;
+    }
+
+    public List<GroupListInfoDTO> getGroupInfoList(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        List<GroupUser> groupUserList = groupUserRepository.findByUserAndStatus(user, ACTIVE_STATUS);
+        List<GroupListInfoDTO> groupListInfoDTOList = new ArrayList<>();
+
+        for(GroupUser groupUser: groupUserList){
+            GroupListInfoDTO groupInfo = getGroupInfo(groupUser.getGroup().getId(), userId);
+            groupInfo.SetRole(groupUser.getRole());
+            groupListInfoDTOList.add(groupInfo);
+        }
+        return groupListInfoDTOList;
     }
 }
