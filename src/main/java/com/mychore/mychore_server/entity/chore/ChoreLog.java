@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.chore;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mychore.mychore_server.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,7 @@ public class ChoreLog extends BaseEntity {
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chore_id")
+    @JsonIgnore
     private Chore chore;
 
     @NonNull
