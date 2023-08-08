@@ -84,6 +84,14 @@ public class UserService {
         } else throw new BaseException(BaseResponseCode.ALREADY_EXIST_NICKNAME);
     }
 
+    // 프로필 사진 수정
+    public void editProfileImg(Long userId, String imgUrl) {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        user.editImgUrl(imgUrl);
+        userRepository.save(user);
+    }
+
     // 알림 설정 수정
     @Transactional
     public void editNotiAgree(Long userId, String type) {

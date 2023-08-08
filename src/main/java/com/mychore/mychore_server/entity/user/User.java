@@ -59,20 +59,9 @@ public class User extends BaseEntity {
     }
 
     public void editProfile(PatchProfileReq patchProfileReq){
-        editNickname(patchProfileReq.getNickname());
-        editBirth(patchProfileReq.getBirth());
-        editGender(patchProfileReq.getGender());
-    }
-    public void editGender(String gender) {
-        this.gender = Gender.getByName(gender);
-    }
-
-    public void editBirth(String date) {
-        this.birth = LocalDate.parse(date);
-    }
-
-    public void editNickname(String nickname) {
-        this.nickname = nickname;
+        this.nickname = patchProfileReq.getNickname();
+        this.birth = LocalDate.parse(patchProfileReq.getBirth());
+        this.gender = Gender.getByName(patchProfileReq.getGender());
     }
 
     public void editImgUrl(String imgUrl) {

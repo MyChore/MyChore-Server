@@ -15,6 +15,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+import static com.mychore.mychore_server.global.constants.Constant.User.IMG_URL;
+
 @RestController
 @RequestMapping(value = "/users")
 @RequiredArgsConstructor
@@ -63,6 +67,16 @@ public class UserController {
     public BaseResponse<Void> editProfile(@RequestBody @Valid PatchProfileReq patchProfileReq,
                                           @IsLogin LoginStatus loginStatus){
         userService.editProfile(loginStatus.getUserId(), patchProfileReq);
+        return new BaseResponse<>(BaseResponseCode.SUCCESS);
+    }
+
+    // 프로필 사진 수정
+    @Auth
+    @PatchMapping("profileimg")
+    public BaseResponse<Void> editProfileImg(@RequestBody Map<String, String> imgUrl,
+                                             @IsLogin LoginStatus loginStatus){
+        if (imgUrl.get(IMG_URL) == null) return new BaseResponse<>(BaseResponseCode.NULL_IMG_URL);
+        userService.editProfileImg(loginStatus.getUserId(), imgUrl.get(IMG_URL));
         return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
