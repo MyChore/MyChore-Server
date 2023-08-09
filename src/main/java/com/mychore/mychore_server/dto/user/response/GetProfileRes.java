@@ -9,15 +9,15 @@ import lombok.NoArgsConstructor;
 public class GetProfileRes {
     private String nickname;
     private String email;
-    private String imgKey;
+    private String imgUrl;
     private String gender;
     private String birth;
 
     @Builder
-    public GetProfileRes(String nickname, String email, String imgKey, String gender, String birth) {
+    public GetProfileRes(String nickname, String email, String imgUrl, String gender, String birth) {
         this.nickname = nickname;
         this.email = email;
-        this.imgKey = imgKey;
+        this.imgUrl = imgUrl;
         this.gender = gender;
         this.birth = birth;
     }

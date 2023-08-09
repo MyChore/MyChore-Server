@@ -106,7 +106,7 @@ public class GroupAssembler {
                 .groupUserId(member.getId())
                 .role(member.getRole())
                 .nickname(member.getUser().getNickname())
-                .imgKey(member.getUser().getImgKey())
+                .imgUrl(member.getUser().getImgUrl())
                 .build();
     }
 
