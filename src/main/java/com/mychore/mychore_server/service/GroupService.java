@@ -251,4 +251,34 @@ public class GroupService {
         return getStaticData(groupId, userId);
     }
 
+    public List<RemainChoreResDTO> getRemainChore(Long groupId, LocalDate date, Long userId){
+        Group group = validationCheck(groupId, userId);
+        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
+        List<ChoreLog> todayChoreList = choreLogRepository.findAllBySetDateAndIsCompleteAndStatus(date, false, ACTIVE_STATUS);
+
+        List<RemainChoreResDTO> resDTO = new ArrayList<>();
+        for(Room room: roomList){
+            List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
+            int count = 0;
+            for(RoomFurniture furniture: furnitureList){
+                for(ChoreLog choreLog: todayChoreList){
+                    if(choreLog.getChore().getRoomFurniture()==furniture){
+                        count+=1;
+                    }
+                }
+            }
+            RemainChoreResDTO remainChoreResDTO = groupAssembler.toRemainChoreResDto(room, count);
+            resDTO.add(remainChoreResDTO);
+        }
+        return resDTO;
+    }
+
+//    public List<Object> testJoin(LocalDate date){
+//
+//        List<Object> choreLogList = choreLogRepository.getChoreLogWithChore(date);
+////        for(Object choreLog : choreLogList){
+////            choreLog.
+////        }
+//        return choreLogList;
+//    }
 }

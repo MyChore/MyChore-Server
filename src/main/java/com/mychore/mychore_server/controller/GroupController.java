@@ -82,4 +82,15 @@ public class GroupController {
     public BaseResponse<StaticDataResDTO> updateGroupFurniture(@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateRoomReqDTO reqDTO, @IsLogin LoginStatus loginStatus){
         return new BaseResponse<>(groupService.updateGroupFurniture(groupId, reqDTO, loginStatus.getUserId()));
     }
+
+    @Auth
+    @GetMapping("/{groupId}/remain")
+    public BaseResponse<List<RemainChoreResDTO>> getRemainChore(@PathVariable("groupId") Long groupId, @RequestParam("date") LocalDate date, @IsLogin LoginStatus loginStatus){
+        return new BaseResponse<>(groupService.getRemainChore(groupId, date, loginStatus.getUserId()));
+    }
+
+//    @GetMapping("/test")
+//    public BaseResponse<List<Object>> testJoin(@RequestParam("date") LocalDate date){
+//        return new BaseResponse<>(groupService.testJoin(date));
+//    }
 }

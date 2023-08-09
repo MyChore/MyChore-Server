@@ -165,4 +165,11 @@ public class GroupAssembler {
                 .name(chore.getName())
                 .build();
     }
+
+    public RemainChoreResDTO toRemainChoreResDto(Room room, Integer remainChores){
+        return RemainChoreResDTO.builder()
+                .roomId(room.getId())
+                .remainChores(remainChores)
+                .build();
+    }
 }
