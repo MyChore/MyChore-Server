@@ -12,6 +12,8 @@ public final class Constant {
         public static final String TODAY = "today";
         public static final String NEW_USER = "new-user";
         public static final String DELETE = "delete";
+
+        public static final String IMG_URL = "imgUrl";
     }
 
     public static class Notification {

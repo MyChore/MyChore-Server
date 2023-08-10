@@ -1,5 +1,6 @@
 package com.mychore.mychore_server.entity.chore;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
 import com.mychore.mychore_server.global.constants.Repetition;
 import com.mychore.mychore_server.entity.BaseEntity;
@@ -33,16 +34,19 @@ public class Chore extends BaseEntity {
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_furn_id")
+    @JsonIgnore
     private RoomFurniture roomFurniture;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
+    @JsonIgnore
     private Group group;
 
     @NonNull

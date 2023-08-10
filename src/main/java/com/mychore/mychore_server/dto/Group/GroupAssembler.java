@@ -106,7 +106,7 @@ public class GroupAssembler {
                 .groupUserId(member.getId())
                 .role(member.getRole())
                 .nickname(member.getUser().getNickname())
-                .imgKey(member.getUser().getImgKey())
+                .imgUrl(member.getUser().getImgUrl())
                 .build();
     }
 
@@ -163,6 +163,13 @@ public class GroupAssembler {
                 .roomFurnitureId(chore.getRoomFurniture().getId())
                 .userId(chore.getUser().getId())
                 .name(chore.getName())
+                .build();
+    }
+
+    public RemainChoreResDTO toRemainChoreResDto(Room room, Integer remainChores){
+        return RemainChoreResDTO.builder()
+                .roomId(room.getId())
+                .remainChores(remainChores)
                 .build();
     }
 }

@@ -14,7 +14,7 @@ public class UserSignUpReq {
     private String gender;
     @NotBlank(message = "U0009")
     private String nickname;
-    private String imgKey;
+    private String imgUrl;
     @NotBlank(message = "U0011")
     private String provider;
     @NotNull(message = "U0012")

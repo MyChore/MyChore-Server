@@ -40,7 +40,7 @@ public class User extends BaseEntity {
 
     private LocalDate birth;
 
-    private String imgKey;
+    private String imgUrl;
 
     @NonNull
     @Enumerated(EnumType.STRING)
@@ -51,39 +51,27 @@ public class User extends BaseEntity {
     private String deviceToken;
 
     @Builder
-    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgKey, @NonNull Provider provider, String deviceToken) {
+    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgUrl, @NonNull Provider provider) {
         this.email = email;
         this.nickname = nickname;
         this.gender = gender;
         this.birth = birth;
-        this.imgKey = imgKey;
+        this.imgUrl = imgUrl;
         this.provider = provider;
         this.deviceToken = deviceToken;
     }
 
     public void editProfile(PatchProfileReq patchProfileReq) {
-        editNickname(patchProfileReq.getNickname());
-        editBirth(patchProfileReq.getBirth());
-        editGender(patchProfileReq.getGender());
+        this.nickname = patchProfileReq.getNickname();
+        this.birth = LocalDate.parse(patchProfileReq.getBirth());
+        this.gender = Gender.getByName(patchProfileReq.getGender());
     }
 
-    public void editGender(String gender) {
-        this.gender = Gender.getByName(gender);
+    public void editImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 
-    public void editBirth(String date) {
-        this.birth = LocalDate.parse(date);
-    }
-
-    public void editNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void editImgKey(String imgKey) {
-        this.imgKey = imgKey;
-    }
-
-    public void updateRefreshToken(String refreshToken){
+    public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 

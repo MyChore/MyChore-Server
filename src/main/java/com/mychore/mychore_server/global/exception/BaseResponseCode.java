@@ -39,6 +39,7 @@ public enum BaseResponseCode {
     NULL_IS_14OVER("U0012", HttpStatus.BAD_REQUEST, "만 14세 이상 동의 여부를 입력해주세요."),
     NULL_IS_Accept_EMAIL("U0013", HttpStatus.BAD_REQUEST, "이메일 수신 동의 여부를 입력해주세요."),
     NOT_ACCEPT_NOTI("U0014",HttpStatus.BAD_REQUEST,"사용자가 알림을 허용하지 않았습니다."),
+    NULL_IMG_URL("U0014", HttpStatus.BAD_REQUEST, "이미지 url이 없습니다."),
 
     // group
     NOT_FOUND_GROUP("G0001", HttpStatus.NOT_FOUND, "그룹을 찾을 수 없습니다."),

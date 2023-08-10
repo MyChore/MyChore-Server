@@ -5,6 +5,8 @@ import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,4 +18,7 @@ public interface ChoreRepository extends JpaRepository<Chore, Long>, ChoreReposi
     List<Chore> findAllByRoomFurnitureAndStatus(RoomFurniture furniture, String status);
 
     List<Chore> findAllByUserAndGroup(User user, Group group);
+
+    @Query("select c, rf from Chore c left join c.roomFurniture rf where c.id =:id")
+    Object getChoreWithRoomFurniture(@Param("id") Long id);
 }
