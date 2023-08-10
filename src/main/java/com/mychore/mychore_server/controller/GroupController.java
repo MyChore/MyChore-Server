@@ -91,14 +91,16 @@ public class GroupController {
 
     @Auth
     @DeleteMapping("/{groupId}/withdraw/{userId}")
-    public BaseResponse<String> withdrawUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, @IsLogin LoginStatus loginStatus){
-        return new BaseResponse<>(groupService.withdrawUser(groupId, userId, loginStatus.getUserId()));
+    public BaseResponse<Void> withdrawUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, @IsLogin LoginStatus loginStatus){
+        groupService.withdrawUser(groupId, userId, loginStatus.getUserId());
+        return new BaseResponse<>();
     }
 
     @Auth
-    @DeleteMapping("/member/{groupId}")
-    public BaseResponse<String> deleteUser(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
-        return new BaseResponse<>(groupService.deleteUser(groupId, loginStatus.getUserId()));
+    @DeleteMapping("/{groupId}/member")
+    public BaseResponse<Void> deleteUser(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
+        groupService.deleteUser(groupId, loginStatus.getUserId());
+        return new BaseResponse<>();
     }
 
 //    @GetMapping("/test")

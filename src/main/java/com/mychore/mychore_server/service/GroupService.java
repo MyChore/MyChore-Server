@@ -272,7 +272,7 @@ public class GroupService {
         return resDTO;
     }
 
-    public String withdrawUser(Long groupId, Long memberId, Long ownerId){
+    public void withdrawUser(Long groupId, Long memberId, Long ownerId){
         CheckResDTO ownerCheck = ownerCheck(groupId, ownerId);
         CheckResDTO memberCheck = validationCheck(groupId, memberId);
         groupUserRepository.findByUserAndGroupAndRoleAndStatus
@@ -280,16 +280,14 @@ public class GroupService {
                         .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
 
         setInactive(memberCheck);
-        return "성공적으로 추방 되었습니다.";
     }
 
-    public String deleteUser(Long groupId, Long userId){
+    public void deleteUser(Long groupId, Long userId){
         CheckResDTO memberCheck = validationCheck(groupId, userId);
         groupUserRepository.findByUserAndGroupAndRoleAndStatus
                         (memberCheck.getUser(), memberCheck.getGroup(), MEMBER, ACTIVE_STATUS)
                         .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
         setInactive(memberCheck);
-        return "성공적으로 탈퇴 되었습니다.";
     }
 
     private void setInactive(CheckResDTO checkResDTO){
