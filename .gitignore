@@ -7,6 +7,7 @@ build/
 
 ### secret ###
 application-secret.yaml
+mychore-firbase-private-key.json
 
 ### STS ###
 .apt_generated
@@ -35,6 +36,3 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-### VS Code ###
-.vscode/
