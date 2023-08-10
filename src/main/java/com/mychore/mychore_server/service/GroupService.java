@@ -12,6 +12,7 @@ import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FurnitureType;
+import com.mychore.mychore_server.global.constants.Role;
 import com.mychore.mychore_server.global.exception.BaseException;
 import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.repository.*;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
+import static com.mychore.mychore_server.global.constants.Constant.INACTIVE_STATUS;
 import static com.mychore.mychore_server.global.constants.Role.MEMBER;
 import static com.mychore.mychore_server.global.constants.Role.OWNER;
 
@@ -208,28 +210,28 @@ public class GroupService {
         return resDTO;
     }
 
-    private Group groupOwnerCheck(Long groupId, Long userId){
-//        validation check
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-
-//        owner check
-        groupUserRepository.findByUserAndGroupAndRoleAndStatus(user, group, OWNER, ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
-
-        return group;
-    }
+//    private Group groupOwnerCheck(Long groupId, Long userId){
+////        validation check
+//        Group group = groupRepository.findById(groupId)
+//                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+//
+////        owner check
+//        groupUserRepository.findByUserAndGroupAndRoleAndStatus(user, group, OWNER, ACTIVE_STATUS)
+//                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+//
+//        return group;
+//    }
 
     public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
-        Group group = groupOwnerCheck(groupId, userId);
+        Group group = userRoleCheck(groupId, userId, OWNER);
         group.SetName(newName);
         return getStaticData(groupId, userId);
     }
 
     public StaticDataResDTO updateGroupFurniture(Long groupId, UpdateRoomReqDTO reqDTO, Long userId){
-        Group group = groupOwnerCheck(groupId, userId);
+        Group group = userRoleCheck(groupId, userId, OWNER);
 
         for(UpdateRoomFurnitureInfoDTO roomFurnitureInfo: reqDTO.getRoomFurnitureInfoList()){
             Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomFurnitureInfo.getRoomId(), group, ACTIVE_STATUS)
@@ -271,6 +273,52 @@ public class GroupService {
             resDTO.add(remainChoreResDTO);
         }
         return resDTO;
+    }
+
+    public String withdrawUser(Long groupId, Long userId, Long ownerId){
+        Group group = userRoleCheck(groupId, ownerId, OWNER);
+        userRoleCheck(groupId, userId, MEMBER);
+        validationCheck(groupId, userId);
+
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).get();
+
+        setInactive(group, user);
+        return "성공적으로 추방 되었습니다.";
+    }
+
+    public String deleteUser(Long groupId, Long userId){
+        Group group = validationCheck(groupId, userId);
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).get();
+
+        setInactive(group, user);
+        return "성공적으로 탈퇴 되었습니다.";
+    }
+
+    private Group userRoleCheck(Long groupId, Long userId, Role role){
+//        validation check
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+
+//        owner check
+        groupUserRepository.findByUserAndGroupAndRoleAndStatus(user, group, role, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+
+        return group;
+    }
+
+    private void setInactive(Group group, User user){
+        GroupUser groupUser = groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS).get();
+        List<Chore> choreList = choreRepository.findAllByGroupAndUserAndStatus(group, user, ACTIVE_STATUS);
+        for(Chore chore: choreList){
+            List<ChoreLog> choreLogList = choreLogRepository.findChoreLogsByChore(chore);
+            for(ChoreLog choreLog: choreLogList){
+                choreLog.setStatus(INACTIVE_STATUS);
+            }
+            chore.setStatus(INACTIVE_STATUS);
+        }
+        groupUser.setStatus(INACTIVE_STATUS);
     }
 
 //    public List<Object> testJoin(LocalDate date){
