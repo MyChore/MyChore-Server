@@ -15,6 +15,6 @@ public interface ChoreLogRepository extends JpaRepository<ChoreLog, Long> {
     List<ChoreLog> findAllBySetDateAndStatus(LocalDate setDate, String status);
     List<ChoreLog> findChoreLogsByChore(Chore chore);
 
-    Optional<ChoreLog> findByChore(Chore chore);
+    Optional<ChoreLog> findFirstByChoreOrderByUpdatedAtDesc(Chore chore);
 
 }
