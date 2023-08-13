@@ -12,6 +12,7 @@ import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.constants.FurnitureType;
+import com.mychore.mychore_server.global.constants.Role;
 import com.mychore.mychore_server.global.exception.BaseException;
 import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.repository.*;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
+import static com.mychore.mychore_server.global.constants.Constant.INACTIVE_STATUS;
 import static com.mychore.mychore_server.global.constants.Role.MEMBER;
 import static com.mychore.mychore_server.global.constants.Role.OWNER;
 
@@ -122,15 +124,15 @@ public class GroupService {
         return resDTO;
     }
 
-    private Group validationCheck(Long groupId, Long userId){
+    private CheckResDTO validationCheck(Long groupId, Long userId){
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+        GroupUser groupUser = groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_MEMBER));
 
-        return group;
+        return groupAssembler.toCheckResDto(group, user, groupUser);
     }
 
     private List<UserInfoDTO> getUserInfoList(Group group){
@@ -142,12 +144,12 @@ public class GroupService {
     }
 
     public StaticDataResDTO getStaticData(Long groupId, Long userId){
-        Group group = validationCheck(groupId, userId);
+        CheckResDTO check = validationCheck(groupId, userId);
 
-        List<UserInfoDTO> userInfoDTOList = getUserInfoList(group);
+        List<UserInfoDTO> userInfoDTOList = getUserInfoList(check.getGroup());
 
         List<GetRoomInfoDTO> roomInfoDTOList = new ArrayList<>();
-        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
+        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(check.getGroup(), ACTIVE_STATUS);
         for(Room room: roomList){
             List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
             List<PlacedFurnitureInfoDTO> furnitureInfoDTOList = new ArrayList<>();
@@ -157,14 +159,14 @@ public class GroupService {
             roomInfoDTOList.add(groupAssembler.toGetRoomInfoDto(room, furnitureInfoDTOList));
         }
 
-        return groupAssembler.toStaticDataResDto(group, userInfoDTOList, roomInfoDTOList);
+        return groupAssembler.toStaticDataResDto(check.getGroup(), userInfoDTOList, roomInfoDTOList);
     }
 
     private GroupListInfoDTO getGroupInfo(Long groupId, Long userId){
-        Group group = validationCheck(groupId, userId);
-        GroupListInfoDTO groupInfo = groupAssembler.toGroupListInfoDto(group);
+        CheckResDTO check = validationCheck(groupId, userId);
+        GroupListInfoDTO groupInfo = groupAssembler.toGroupListInfoDto(check.getGroup());
 
-        List<UserInfoDTO> userInfoDTOList = getUserInfoList(group);
+        List<UserInfoDTO> userInfoDTOList = getUserInfoList(check.getGroup());
         groupInfo.SetMemberList(userInfoDTOList);
 
         return groupInfo;
@@ -208,31 +210,28 @@ public class GroupService {
         return resDTO;
     }
 
-    private Group groupOwnerCheck(Long groupId, Long userId){
+    private CheckResDTO ownerCheck(Long groupId, Long userId){
 //        validation check
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        CheckResDTO check = validationCheck(groupId, userId);
 
-//        owner check
-        groupUserRepository.findByUserAndGroupAndRoleAndStatus(user, group, OWNER, ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
+//        role check
+        groupUserRepository.findByUserAndGroupAndRoleAndStatus(check.getUser(), check.getGroup(), OWNER, ACTIVE_STATUS)
+                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_OWNER_PERMISSION));
 
-        return group;
+        return check;
     }
 
     public StaticDataResDTO updateGroupName(Long groupId, String newName, Long userId){
-        Group group = groupOwnerCheck(groupId, userId);
-        group.SetName(newName);
+        CheckResDTO check = ownerCheck(groupId, userId);
+        check.getGroup().SetName(newName);
         return getStaticData(groupId, userId);
     }
 
     public StaticDataResDTO updateGroupFurniture(Long groupId, UpdateRoomReqDTO reqDTO, Long userId){
-        Group group = groupOwnerCheck(groupId, userId);
+        CheckResDTO check = ownerCheck(groupId, userId);
 
         for(UpdateRoomFurnitureInfoDTO roomFurnitureInfo: reqDTO.getRoomFurnitureInfoList()){
-            Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomFurnitureInfo.getRoomId(), group, ACTIVE_STATUS)
+            Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomFurnitureInfo.getRoomId(), check.getGroup(), ACTIVE_STATUS)
                     .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
             for(UpdateFurnitureInfoDTO furnitureInfo: roomFurnitureInfo.getFurnitureInfoList()){
                 Furniture furniture = furnitureRepository.findByIdAndStatus(furnitureInfo.getFurnitureId(), ACTIVE_STATUS)
@@ -242,7 +241,7 @@ public class GroupService {
                 }
                 else{
                     RoomFurniture roomFurniture = roomFurnitureRepository.findRoomFurnitureByIdAndStatus(furnitureInfo.getRoomFurnId(), ACTIVE_STATUS)
-                            .orElseThrow(() -> new BaseException(BaseResponseCode.BAD_REQUEST));
+                            .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM_FURNITURE));
                     roomFurniture.SetNewInfo(furnitureInfo);
                     roomFurnitureRepository.save(roomFurniture);
                 }
@@ -252,8 +251,8 @@ public class GroupService {
     }
 
     public List<RemainChoreResDTO> getRemainChore(Long groupId, LocalDate date, Long userId){
-        Group group = validationCheck(groupId, userId);
-        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
+        CheckResDTO check = validationCheck(groupId, userId);
+        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(check.getGroup(), ACTIVE_STATUS);
         List<ChoreLog> todayChoreList = choreLogRepository.findAllBySetDateAndIsCompleteAndStatus(date, false, ACTIVE_STATUS);
 
         List<RemainChoreResDTO> resDTO = new ArrayList<>();
@@ -271,6 +270,40 @@ public class GroupService {
             resDTO.add(remainChoreResDTO);
         }
         return resDTO;
+    }
+
+    public void withdrawUser(Long groupId, Long memberId, Long ownerId){
+        CheckResDTO ownerCheck = ownerCheck(groupId, ownerId);
+        CheckResDTO memberCheck = validationCheck(groupId, memberId);
+        groupUserRepository.findByUserAndGroupAndRoleAndStatus
+                        (memberCheck.getUser(), memberCheck.getGroup(), MEMBER, ACTIVE_STATUS)
+                        .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
+
+        setInactive(memberCheck);
+    }
+
+    public void deleteUser(Long groupId, Long userId){
+        CheckResDTO memberCheck = validationCheck(groupId, userId);
+        groupUserRepository.findByUserAndGroupAndRoleAndStatus
+                        (memberCheck.getUser(), memberCheck.getGroup(), MEMBER, ACTIVE_STATUS)
+                        .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
+        setInactive(memberCheck);
+    }
+
+    private void setInactive(CheckResDTO checkResDTO){
+        GroupUser groupUser = checkResDTO.getGroupUser();
+        List<Chore> choreList = choreRepository.findAllByGroupAndUserAndStatus(checkResDTO.getGroup(), checkResDTO.getUser(), ACTIVE_STATUS);
+        for(Chore chore: choreList){
+            List<ChoreLog> choreLogList = choreLogRepository.findChoreLogsByChore(chore);
+            for(ChoreLog choreLog: choreLogList){
+                choreLog.setStatus(INACTIVE_STATUS);
+                choreLogRepository.save(choreLog);
+            }
+            chore.setStatus(INACTIVE_STATUS);
+            choreRepository.save(chore);
+        }
+        groupUser.setStatus(INACTIVE_STATUS);
+        groupUserRepository.save(groupUser);
     }
 
 //    public List<Object> testJoin(LocalDate date){

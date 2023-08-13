@@ -172,4 +172,12 @@ public class GroupAssembler {
                 .remainChores(remainChores)
                 .build();
     }
+
+    public CheckResDTO toCheckResDto(Group group, User user, GroupUser groupUser){
+        return CheckResDTO.builder()
+                .group(group)
+                .user(user)
+                .groupUser(groupUser)
+                .build();
+    }
 }
