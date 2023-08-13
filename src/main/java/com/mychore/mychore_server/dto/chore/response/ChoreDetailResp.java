@@ -16,7 +16,6 @@ public class ChoreDetailResp implements Comparable<ChoreDetailResp>{
 
     private Long id;
 
-    // 다른 DTO 개발시 DTO로 변경 예정
     private Long userId;
     private Long roomFurnitureId;
     private Long groupId;
@@ -32,7 +31,7 @@ public class ChoreDetailResp implements Comparable<ChoreDetailResp>{
     private Boolean completeStatus;
     private LocalTime notiTime;
 
-    public ChoreDetailResp(Chore chore) {
+    public ChoreDetailResp(Chore chore, LocalDate setDate, Boolean completeStatus) {
         this.id = chore.getId();
         this.userId = chore.getUser().getId();
         this.roomFurnitureId = chore.getRoomFurniture().getId();
@@ -44,8 +43,9 @@ public class ChoreDetailResp implements Comparable<ChoreDetailResp>{
         this.lastDate = chore.getLastDate();
         this.repetition = chore.getRepetition();
         this.notiTime = chore.getNotiTime();
+        this.setDate = setDate;
+        this.completeStatus = completeStatus;
     }
-
 
     @Override
     public int compareTo(ChoreDetailResp other) {

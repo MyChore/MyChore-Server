@@ -58,6 +58,7 @@ public enum BaseResponseCode {
     NULL_CHORE_NAME("C0007", HttpStatus.BAD_REQUEST, "집안일 이름을 입력해주세요."),
     NULL_START_DATE("C0008", HttpStatus.BAD_REQUEST, "시작날짜를 입력해주세요."),
     NULL_IS_ACCEPT_NOTI("C0009", HttpStatus.BAD_REQUEST, "알림 수신여부를 입력해주세요."),
+    INVALID_REPETITION("C0010", HttpStatus.BAD_REQUEST, "잘못된 반복유형입니다."),
     ;
 
     public final String code;

@@ -32,10 +32,11 @@ public class ChoreCreateReq {
     private LocalDate startDate;
 
     private LocalDate lastDate;
-    private Repetition repetition;
 
     @NotNull(message = "C0009")
     private Boolean isAcceptNoti;
     private LocalTime notiTime;
 
+    @NotNull(message = "C0010")
+    private Repetition repetition;
 }

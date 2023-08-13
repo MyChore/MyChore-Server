@@ -24,6 +24,7 @@ public class ChoreController {
 
     private final ChoreService choreService;
 
+    // 집안일 생성
     @Auth
     @PostMapping
     public BaseResponse<Void> saveChoreAPI(
@@ -33,6 +34,7 @@ public class ChoreController {
         return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
+    // 집안일 다건 조회
     @Auth
     @GetMapping
     public BaseResponse<List<ChoreDetailResp>> getChoresAPI(
@@ -44,6 +46,7 @@ public class ChoreController {
         return new BaseResponse<>(choreService.findChores(userId, groupId, roomId, fromDate, toDate, loginStatus.getUserId()));
     }
 
+    // 집안일 단건 조회
     @Auth
     @GetMapping("/{choreId}")
     public BaseResponse<ChoreSimpleResp> getChoreAPI(
@@ -52,6 +55,7 @@ public class ChoreController {
         return new BaseResponse<>(choreService.findChore(choreId, loginStatus.getUserId()));
     }
 
+    // 집안일 완료율 조회
     @Auth
     @GetMapping("/completion-rate")
     public BaseResponse<Integer> getChoresCompletionRateAPI(
@@ -63,6 +67,7 @@ public class ChoreController {
         return new BaseResponse<>(choreService.getChoreCompletionRate(userId, groupId, roomId, fromDate, toDate, loginStatus.getUserId()));
     }
 
+    // 집안일 완료 설정
     @Auth
     @PostMapping("/{choreId}/log")
     public BaseResponse<Void> setChoreLogStatusAPI(
@@ -74,6 +79,7 @@ public class ChoreController {
         return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
+    // 집안일 수정
     @Auth
     @PatchMapping("/{choreId}")
     public BaseResponse<Void> updateChoreAPI(
@@ -84,6 +90,7 @@ public class ChoreController {
         return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }
 
+    // 집안일 삭제(소프트)
     @Auth
     @DeleteMapping("/{choreId}")
     public BaseResponse<Void> deleteChoreAPI(
