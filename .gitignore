@@ -7,7 +7,7 @@ build/
 
 ### secret ###
 application-secret.yaml
-mychore-firbase-private-key.json
+src/main/resources/mychore-firbase-private-key.json
 
 ### STS ###
 .apt_generated
