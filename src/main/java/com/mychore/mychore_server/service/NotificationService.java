@@ -1,11 +1,10 @@
 package com.mychore.mychore_server.service;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.MulticastMessage;
 import com.mychore.mychore_server.dto.notification.NotiAssembler;
-import com.mychore.mychore_server.dto.notification.request.NotiChoreReq;
-import com.mychore.mychore_server.dto.notification.request.NotiReq;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
@@ -25,6 +24,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,9 +44,10 @@ public class NotificationService {
     private final GroupUserRepository groupUserRepository;
     private final ChoreLogRepository choreLogRepository;
     private final UserAgreeRepository userAgreeRepository;
+    private final ObjectMapper objectMapper;
 
     // FCM AccessToken 발급
-    private static String getAccessToken() throws IOException {
+    private String getAccessToken() throws IOException {
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource("mychore-firbase-private-key.json").getInputStream())
@@ -87,157 +89,122 @@ public class NotificationService {
     }
 
     // 그룹원 집안일 완료 알림
-    public MulticastMessage groupChore(NotiChoreReq requestDTO, Long userId) {
-
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        if (!userAgree.getIsAgreeDoneNoti()) {
-            throw new BaseException(BaseResponseCode.NOT_ACCEPT_NOTI);
-        }
-        Group group = groupRepository.findGroupByIdAndStatus(requestDTO.getGroupId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+    public void groupChore(User user, Group group, Chore chore) throws IOException {
 
         List<GroupUser> groupUsers = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
 
-        if (!user.getDeviceToken().equals(requestDTO.getDeviceToken())) {
-            throw new BaseException(BaseResponseCode.INVALID_DEVICE_TOKEN);
-        }
-        Chore chore = choreRepository.findById(requestDTO.getChoreId()).orElseThrow((() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE)));
         ChoreLog choreLog = choreLogRepository.findFirstByChoreOrderByUpdatedAtDesc(chore).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE_LOG));
-        if (!choreLog.getIsComplete()) {
-            throw new BaseException(BaseResponseCode.NOT_COMPLETE_CHORE);
+        if (choreLog.getIsComplete()) {
+            List<String> deviceTokens = new ArrayList<>();
+
+            // 집안일을 완료한 그룹원을 제외한 list
+            List<User> findUsers = groupUsers.stream().map(GroupUser::getUser)
+                    .filter(findUser -> findUser.getStatus().equals(ACTIVE_STATUS)
+                            && !findUser.equals(user)).toList();
+            for (User u : findUsers) {
+                if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeDoneNoti()) {
+                    deviceTokens.add(u.getDeviceToken());
+                }
+            }
+
+            if (!deviceTokens.isEmpty()) {
+                String body = "그룹원 " + user.getNickname() + "님이" + chore.getName() + "를 완료했습니다!!";
+
+                findUsers.forEach(findUser -> notificationRepository.save(notiAssembler.toEntity(findUser, group, "MyChore", body)));
+
+                objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+                getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), deviceTokens)));
+            }
         }
 
-
-        // 집안일을 완료한 그룹원을 제외한 list
-        List<User> findUsers = groupUsers.stream().map(GroupUser::getUser)
-                .filter(findUser -> findUser.getStatus().equals(ACTIVE_STATUS)
-                        && !findUser.equals(user)).toList();
-
-        List<String> deviceTokens = findUsers.stream().map(User::getDeviceToken).filter(deviceToken -> !deviceToken.isEmpty()).toList();
-        if (deviceTokens.isEmpty()) {
-            throw new BaseException(BaseResponseCode.NOT_FOUND_GROUP_DEVICE_TOKEN);
-        }
-
-        String body = "그룹원 " + user.getNickname() + "님이" + chore.getName() + "를 완료했습니다!!";
-
-        findUsers.forEach(findUser -> notificationRepository.save(notiAssembler.toEntity(findUser, group, "MyChore", body)));
-
-        return notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), deviceTokens);
     }
 
     // 오늘의 집안일 알림
-    public Message todayChores(NotiReq requestDTO, Long userId) {
+    public void todayChores(User user) throws IOException {
 
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        if (!userAgree.getIsAgreeTodayNoti()) {
-            throw new BaseException(BaseResponseCode.NOT_ACCEPT_NOTI);
+        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(user.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        if (userAgree.getIsAgreeTodayNoti()) {
+            List<GroupUser> groupUsers = groupUserRepository.findByUserAndStatus(user, ACTIVE_STATUS);
+            for (GroupUser groupUser : groupUsers) {
+                Group group = groupRepository.findGroupByIdAndStatus(groupUser.getGroup().getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+                List<Chore> chores = choreRepository.findAllByUserAndGroupAndUpdatedAtAndStatus(user, group, LocalDate.now(), INACTIVE_STATUS);
+                if (!chores.isEmpty()) {
+
+                    List<String> list = chores.stream().map(Chore::getName).toList();
+                    String body = "오늘은 " + String.join(COMMA, list) + "가 있는 날입니다! MyChore에서 함께 해봐요.";
+
+                    notificationRepository.save(notiAssembler.toEntity(user, group, TITLE, body));
+
+                    objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+                    getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), user.getDeviceToken())));
+                }
+            }
         }
-        Group group = groupRepository.findGroupByIdAndStatus(requestDTO.getGroupId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
-
-        if (!user.getDeviceToken().equals(requestDTO.getDeviceToken())) {
-            throw new BaseException(BaseResponseCode.INVALID_DEVICE_TOKEN);
-        }
-        List<Chore> chores = choreRepository.findAllByUserAndGroup(user, group);
-
-        String body = null;
-        if (chores.isEmpty()) {
-            body = "오늘은 해야하는 집안일이 없습니다. 푹 쉬세요!";
-        } else {
-            List<String> list = chores.stream().map(Chore::getName).toList();
-            body = "오늘은 " + String.join(COMMA, list) + "가 있는 날입니다! MyChore에서 함께 해봐요.";
-        }
-
-        notificationRepository.save(notiAssembler.toEntity(user, group, TITLE, body));
-
-        return notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), requestDTO.getDeviceToken());
     }
 
-    // 새로운 구성원 추가 알림
-    public MulticastMessage newMember(NotiReq requestDTO, Long userId) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        if (!userAgree.getIsAgreeNewUserNoti()) {
-            throw new BaseException(BaseResponseCode.NOT_ACCEPT_NOTI);
-        }
-        if (!user.getDeviceToken().equals(requestDTO.getDeviceToken())) {
-            throw new BaseException(BaseResponseCode.INVALID_DEVICE_TOKEN);
-        }
 
-        Group group = groupRepository.findGroupByIdAndStatus(requestDTO.getGroupId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+    // 새로운 구성원 추가 알림
+    public void newMember(User user, Group group) throws IOException {
 
         List<GroupUser> groupUsers = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
-
 
         List<User> findUsers = groupUsers.stream().map(GroupUser::getUser)
                 .filter(findUser -> findUser.getStatus().equals(ACTIVE_STATUS)
                         && !findUser.equals(user)).toList();
 
-        List<String> deviceTokens = findUsers.stream().map(User::getDeviceToken).filter(deviceToken -> !deviceToken.isEmpty()).toList();
-        if (deviceTokens.isEmpty()) {
-            throw new BaseException(BaseResponseCode.NOT_FOUND_GROUP_DEVICE_TOKEN);
+        List<String> deviceTokens = new ArrayList<>();
+        for (User u : findUsers) {
+            if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeNewUserNoti()) {
+                deviceTokens.add(u.getDeviceToken());
+            }
+        }
+        if (!deviceTokens.isEmpty()) {
+            String body = group.getName() + " 그룹에 " + user.getNickname() + "님이 들어왔습니다. 환영해주세요!";
+
+            findUsers.forEach(findUser -> notificationRepository.save(notiAssembler.toEntity(findUser, group, TITLE, body)));
+
+            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), deviceTokens)));
         }
 
-        String body = group.getName() + " 그룹에 " + user.getNickname() + "님이 들어왔습니다. 환영해주세요!";
-
-        findUsers.forEach(findUser -> notificationRepository.save(notiAssembler.toEntity(findUser, group, TITLE, body)));
-
-        return notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), deviceTokens);
     }
 
     // 그룹 삭제 알림
-    public MulticastMessage deleteGroup(NotiReq requestDTO, Long userId) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        if (!userAgree.getIsAgreeDeleteNoti()) {
-            throw new BaseException(BaseResponseCode.NOT_ACCEPT_NOTI);
-        }
-        Group group = groupRepository.findGroupByIdAndStatus(requestDTO.getGroupId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+    public void deleteGroup(User user, Group group) throws IOException {
 
         List<GroupUser> groupUsers = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
-
-        if (!user.getDeviceToken().equals(requestDTO.getDeviceToken())) {
-            throw new BaseException(BaseResponseCode.INVALID_DEVICE_TOKEN);
-        }
 
         List<User> findUsers = groupUsers.stream().map(GroupUser::getUser)
                 .filter(findUser -> findUser.getStatus().equals(ACTIVE_STATUS)
                         && !findUser.equals(user)).toList();
 
-        List<String> deviceTokens = findUsers.stream().map(User::getDeviceToken).filter(deviceToken -> !deviceToken.isEmpty()).toList();
-        if (deviceTokens.isEmpty()) {
-            throw new BaseException(BaseResponseCode.NOT_FOUND_GROUP_DEVICE_TOKEN);
+        List<String> deviceTokens = new ArrayList<>();
+        for (User u : findUsers) {
+            if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeDeleteNoti()) {
+                deviceTokens.add(u.getDeviceToken());
+            }
         }
+        if (!deviceTokens.isEmpty()) {
+            String body = "그룹장이 그룹을 나가 " + group.getName() + " 그룹이 삭제되었습니다.";
 
-        String body = "그룹장이 그룹을 나가 " + group.getName() + " 그룹이 삭제되었습니다.";
-
-        findUsers.forEach(findUser -> notificationRepository.save(notiAssembler.toEntity(findUser, group, TITLE, body)));
-        return notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), deviceTokens);
+            findUsers.forEach(findUser -> notificationRepository.save(notiAssembler.toEntity(findUser, group, TITLE, body)));
+            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), deviceTokens)));
+        }
     }
 
     // 특정 시간 집안일 알림
-    public Message notiChore(NotiChoreReq requestDTO, Long userId) {
-        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        Group group = groupRepository.findGroupByIdAndStatus(requestDTO.getGroupId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
-        Chore chore = choreRepository.findById(requestDTO.getChoreId()).orElseThrow((() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE)));
+    public void notiChore(User user, Group group, Chore chore) throws IOException {
+        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(user.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
 
-        if (!userAgree.getIsAgreeChoreNoti() || !chore.getIsAcceptNoti()) {
-            throw new BaseException(BaseResponseCode.NOT_ACCEPT_NOTI);
+        if (userAgree.getIsAgreeChoreNoti() && chore.getIsAcceptNoti()
+                && !choreLogRepository.findFirstByChoreOrderByUpdatedAtDesc(chore).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE_LOG)).getIsComplete()) {
+
+            String body = chore.getName() + " 를 해야할 시간입니다! MyChore에서 함께해봐요";
+
+            notificationRepository.save(notiAssembler.toEntity(user, group, TITLE, body));
+            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), user.getDeviceToken())));
         }
-
-        if (!user.getDeviceToken().equals(requestDTO.getDeviceToken())) {
-            throw new BaseException(BaseResponseCode.INVALID_DEVICE_TOKEN);
-        }
-
-
-        if (choreLogRepository.findFirstByChoreOrderByUpdatedAtDesc(chore).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE_LOG)).getIsComplete()) {
-            throw new BaseException(BaseResponseCode.ALREADY_COMPLETE_CHORE);
-        }
-        String body = chore.getName() + " 를 해야할 시간입니다! MyChore에서 함께해봐요";
-
-        notificationRepository.save(notiAssembler.toEntity(user, group, TITLE, body));
-
-        return notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), requestDTO.getDeviceToken());
     }
 }
