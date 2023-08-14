@@ -188,8 +188,8 @@ public class GroupService {
 
 
     public List<RoomChoreResDTO> getRoomChoreInfo(Long groupId, Long roomId, LocalDate date, Long userId){
-        Group group = validationCheck(groupId, userId);
-        Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomId, group, ACTIVE_STATUS)
+        CheckResDTO check = validationCheck(groupId, userId);
+        Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomId, check.getGroup(), ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
         List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
 
