@@ -92,8 +92,6 @@ public class GroupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
 
-        notificationService.newMember(user, group);
-
         groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
                 .ifPresent( m -> { throw new BaseException(BaseResponseCode.ALREADY_JOIN_GROUP); });
 
