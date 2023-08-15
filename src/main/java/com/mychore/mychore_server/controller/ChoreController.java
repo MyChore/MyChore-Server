@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class ChoreController {
             @PathVariable Long choreId,
             @RequestParam LocalDate setTime,
             @RequestParam Boolean status,
-            @IsLogin LoginStatus loginStatus) {
+            @IsLogin LoginStatus loginStatus) throws IOException {
         choreService.setChoreLog(choreId, setTime, status, loginStatus.getUserId());
         return new BaseResponse<>(BaseResponseCode.SUCCESS);
     }

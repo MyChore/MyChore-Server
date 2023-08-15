@@ -8,6 +8,7 @@ import com.mychore.mychore_server.dto.user.response.UserTokenRes;
 import com.mychore.mychore_server.dto.user.request.UserSignUpReq;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.entity.user.UserAgree;
+import com.mychore.mychore_server.global.config.ScheduleConfig;
 import com.mychore.mychore_server.global.constants.Provider;
 import com.mychore.mychore_server.global.exception.BaseException;
 import com.mychore.mychore_server.global.exception.BaseResponseCode;
@@ -29,6 +30,7 @@ public class UserService {
     private final UserAgreeRepository userAgreeRepository;
     private final JwtUtils jwtUtils;
     private final UserAssembler userAssembler;
+    private final ScheduleConfig scheduleConfig;
 
     // 회원가입
     @Transactional
@@ -40,14 +42,16 @@ public class UserService {
         } else {
             User user = userRepository.save(userAssembler.toEntity(userSignUpReq));
             userAgreeRepository.save(userAssembler.toEntity(user, userSignUpReq));
+            scheduleConfig.startTodayScheduler(user);
             return UserTokenRes.toDto(jwtUtils.createToken(user));
         }
     }
 
     // 로그인
-    public UserTokenRes login(UserLogInReq userLogInReq){
+    public UserTokenRes login(UserLogInReq userLogInReq) {
         User user = userRepository.findByEmailAndProviderAndStatus(userLogInReq.getEmail(), Provider.getByName(userLogInReq.getProvider()), ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_EMAIL));
+        scheduleConfig.login(user);
         return UserTokenRes.toDto(jwtUtils.createToken(user));
     }
 
@@ -55,6 +59,7 @@ public class UserService {
     public void logout(Long userId) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        scheduleConfig.logout(user);
         user.removeTokens();
         userRepository.save(user);
     }
@@ -63,6 +68,7 @@ public class UserService {
     public void withdraw(Long userId) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        scheduleConfig.logout(user);
         user.withdraw();
         userRepository.save(user);
     }
@@ -78,7 +84,7 @@ public class UserService {
     public void editProfile(Long userId, PatchProfileReq patchProfileReq) {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        if (checkNicknameWithEdit(patchProfileReq.getNickname(), userId)){
+        if (checkNicknameWithEdit(patchProfileReq.getNickname(), userId)) {
             user.editProfile(patchProfileReq);
             userRepository.save(user);
         } else throw new BaseException(BaseResponseCode.ALREADY_EXIST_NICKNAME);
@@ -105,16 +111,23 @@ public class UserService {
             case DELETE -> userAgree.setIsAgreeDeleteNoti(!userAgree.getIsAgreeDeleteNoti());
             default -> throw new BaseException(BaseResponseCode.INVALID_NOTI_TYPE);
         }
+
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        if (userAgree.getIsAgreeTodayNoti()) {
+            scheduleConfig.startTodayScheduler(user);
+        } else {
+            scheduleConfig.stopTodayScheduler(user);
+        }
     }
 
     // 가입 시 닉네임 중복체크
-    public boolean checkNicknameWithSignUp(String nickname){
+    public boolean checkNicknameWithSignUp(String nickname) {
         userAssembler.isValidNickname(nickname);
         return userRepository.findByNicknameAndStatus(nickname, ACTIVE_STATUS).isEmpty();
     }
 
     // 프로필 수정 시 닉네임 중복체크
-    private boolean checkNicknameWithEdit(String nickname, Long userId){
+    private boolean checkNicknameWithEdit(String nickname, Long userId) {
         userAssembler.isValidNickname(nickname);
         return userRepository.findByNicknameAndStatusAndIdNot(nickname, ACTIVE_STATUS, userId).isEmpty();
     }

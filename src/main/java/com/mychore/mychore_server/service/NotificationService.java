@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -89,8 +90,9 @@ public class NotificationService {
     }
 
     // 그룹원 집안일 완료 알림
-    public void groupChore(User user, Group group, Chore chore) throws IOException {
-
+    public void groupChore(Long userId, Long groupId, Chore chore) throws IOException {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        Group group = groupRepository.findGroupByIdAndStatus(groupId, ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
         List<GroupUser> groupUsers = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
 
         ChoreLog choreLog = choreLogRepository.findFirstByChoreOrderByUpdatedAtDesc(chore).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE_LOG));
@@ -122,24 +124,23 @@ public class NotificationService {
     // 오늘의 집안일 알림
     public void todayChores(User user) throws IOException {
 
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(user.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-        if (userAgree.getIsAgreeTodayNoti()) {
-            List<GroupUser> groupUsers = groupUserRepository.findByUserAndStatus(user, ACTIVE_STATUS);
-            for (GroupUser groupUser : groupUsers) {
-                Group group = groupRepository.findGroupByIdAndStatus(groupUser.getGroup().getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
-                List<Chore> chores = choreRepository.findAllByUserAndGroupAndUpdatedAtAndStatus(user, group, LocalDate.now(), INACTIVE_STATUS);
-                if (!chores.isEmpty()) {
+        List<GroupUser> groupUsers = groupUserRepository.findByUserAndStatus(user, ACTIVE_STATUS);
+        for (GroupUser groupUser : groupUsers) {
+            Group group = groupRepository.findGroupByIdAndStatus(groupUser.getGroup().getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+            List<Chore> chores = choreRepository.findAllByUserAndGroupAndUpdatedAtAndStatus(user, group, LocalDate.now(), ACTIVE_STATUS);
 
-                    List<String> list = chores.stream().map(Chore::getName).toList();
-                    String body = "오늘은 " + String.join(COMMA, list) + "가 있는 날입니다! MyChore에서 함께 해봐요.";
+            if (!chores.isEmpty()) {
 
-                    notificationRepository.save(notiAssembler.toEntity(user, group, TITLE, body));
+                List<String> list = chores.stream().map(Chore::getName).toList();
+                String body = "오늘은 " + String.join(COMMA, list) + "가 있는 날입니다! MyChore에서 함께 해봐요.";
 
-                    objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-                    getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), user.getDeviceToken())));
-                }
+                notificationRepository.save(notiAssembler.toEntity(user, group, TITLE, body));
+
+                objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+                getConnection(objectMapper.writeValueAsString(notiAssembler.toEntity(notiAssembler.toEntity(TITLE, body), notiAssembler.toEntity(), user.getDeviceToken())));
             }
         }
+
     }
 
 
@@ -194,11 +195,13 @@ public class NotificationService {
     }
 
     // 특정 시간 집안일 알림
-    public void notiChore(User user, Group group, Chore chore) throws IOException {
-        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(user.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+    public void notiChore(Chore chore) throws IOException {
 
-        if (userAgree.getIsAgreeChoreNoti() && chore.getIsAcceptNoti()
-                && !choreLogRepository.findFirstByChoreOrderByUpdatedAtDesc(chore).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_CHORE_LOG)).getIsComplete()) {
+        User user = userRepository.findByIdAndStatus(chore.getUser().getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        Group group = groupRepository.findGroupByIdAndStatus(chore.getGroup().getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
+
+        UserAgree userAgree = userAgreeRepository.findByUserIdAndStatus(user.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        if (userAgree.getIsAgreeChoreNoti() && chore.getIsAcceptNoti() && LocalDate.now().isAfter(chore.getStartDate())) {
 
             String body = chore.getName() + " 를 해야할 시간입니다! MyChore에서 함께해봐요";
 
