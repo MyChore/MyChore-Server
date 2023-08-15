@@ -1,5 +1,7 @@
 package com.mychore.mychore_server.global.constants;
 
+import com.mychore.mychore_server.global.exception.BaseException;
+import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -19,6 +21,6 @@ public enum Repetition {
     public static Repetition getByName(String name){
         return Arrays.stream(Repetition.values())
                 .filter(repetition -> repetition.getRepeatName().equals(name))
-                .findAny().orElse(null);
+                .findAny().orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_REPETITION));
     }
 }

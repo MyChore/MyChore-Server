@@ -25,7 +25,6 @@ import java.util.List;
 import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ChoreService {
 
@@ -53,18 +52,18 @@ public class ChoreService {
     public ChoreSimpleResp findChore(Long choreId, Long loginUserId) {
         Chore choreEntity = findChoreEntity(choreId);
         isGroupMember(choreEntity.getGroup().getId(), loginUserId);
-
-        return ChoreSimpleResp.toDto(choreEntity);
+        return  choreRepository.findChore(choreId);
     }
 
     public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId,
                                             LocalDate fromTime, LocalDate toTime, Long loginUserId) {
         isGroupMember(groupId, loginUserId);
-        isValidfindChoresParameter(userId, groupId, roomId, fromTime, toTime);
+        isValidfindChoresParameter(fromTime, toTime);
 
         return choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
     }
 
+    @Transactional
     public void updateChore(Long choreId, ChoreUpdateReq choreUpdateReqDto, Long loginUserId) {
         Chore findChore = findChoreEntity(choreId);
 
@@ -83,6 +82,7 @@ public class ChoreService {
         }
     }
 
+    @Transactional
     public void setChoreLog(Long choreId, LocalDate setDate, Boolean bool, Long loginUserId) {
         Chore findChore = findChoreEntity(choreId);
 
@@ -99,6 +99,7 @@ public class ChoreService {
         }
     }
 
+    @Transactional
     public void deleteChore(Long choreId, Long loginUserId) {
         Chore choreEntity = findChoreEntity(choreId);
         isGroupMember(choreEntity.getGroup().getId(), loginUserId);
@@ -107,16 +108,18 @@ public class ChoreService {
     }
 
     public int getChoreCompletionRate(Long userId, Long groupId, Long roomId,
-                                          LocalDate fromTime, LocalDate toTime, Long loginUserId) {
+                                      LocalDate fromTime, LocalDate toTime, Long loginUserId) {
 
         isGroupMember(groupId, loginUserId);
-        isValidfindChoresParameter(userId, groupId, roomId, fromTime, toTime);
+        isValidfindChoresParameter(fromTime, toTime);
 
         List<ChoreDetailResp> chores = choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
 
+        if (chores.size()==0) return 100;
+
         int count = 0;
         for (ChoreDetailResp chore : chores) {
-            if (chore.getCompleteStatus()==true) count++;
+            if (chore.getCompleteStatus()) count++;
         }
 
         return count * 100 / chores.size();
@@ -127,11 +130,6 @@ public class ChoreService {
     public User findUserEntity(Long userId) {
         return userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
-    }
-
-    public Room findRoomEntity(Long roomId) {
-        return roomRepository.findRoomByIdAndStatus(roomId, ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
     }
 
     public RoomFurniture findRoomFurnitureEntity(Long roomFurnitureId) {
@@ -150,7 +148,7 @@ public class ChoreService {
     }
 
     public void isGroupMember(Long groupId, Long userId) {
-        groupUserRepository.findGroupUserByUserAndGroupAndStatus(findUserEntity(userId), findGroupEntity(groupId), ACTIVE_STATUS)
+        groupUserRepository.findGroupUserByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NO_PERMISSION));
     }
 
@@ -164,10 +162,7 @@ public class ChoreService {
 
 
     // findChores 검증 로직
-    public void isValidfindChoresParameter(Long userId, Long groupId, Long roomId, LocalDate fromTime, LocalDate toTime) {
-        if (userId!=null) findUserEntity(userId);
-        findGroupEntity(groupId);
-        if (roomId!=null) findRoomEntity(roomId);
+    public void isValidfindChoresParameter(LocalDate fromTime, LocalDate toTime) {
         if (fromTime.isAfter(toTime)) throw new BaseException(BaseResponseCode.INVALID_PERIOD);
     }
 
@@ -185,8 +180,7 @@ public class ChoreService {
 
     //  setChoreLog 파라미터 확인하는 함수
     public void isValidSetLogReqParameter(Chore chore, LocalDate setDate) {
-        if (setDate.isBefore(chore.getStartDate())
-                || (chore.getLastDate()!=null && setDate.isAfter(chore.getLastDate())))
+        if (setDate.isBefore(chore.getStartDate()) || (chore.getLastDate()!=null && setDate.isAfter(chore.getLastDate())))
             throw new BaseException(BaseResponseCode.INVALID_LOG_DATE);
     }
 

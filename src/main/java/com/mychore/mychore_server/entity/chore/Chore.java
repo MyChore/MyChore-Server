@@ -12,6 +12,7 @@ import lombok.*;
 import lombok.Builder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Filter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -66,6 +67,7 @@ public class Chore extends BaseEntity {
     private Repetition repetition;
 
     @OneToMany(mappedBy = "chore")
+    @Filter(name = "choreLogDateFilter", condition = "setDate BETWEEN :fromTime AND :toTime")
     private List<ChoreLog> choreLogList = new ArrayList<>();
 
     public void updateInfo(ChoreUpdateReq choreUpdateReqDto) {
