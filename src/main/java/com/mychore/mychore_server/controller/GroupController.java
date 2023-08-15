@@ -89,6 +89,20 @@ public class GroupController {
         return new BaseResponse<>(groupService.getRemainChore(groupId, date, loginStatus.getUserId()));
     }
 
+    @Auth
+    @DeleteMapping("/{groupId}/withdraw/{userId}")
+    public BaseResponse<Void> withdrawUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, @IsLogin LoginStatus loginStatus){
+        groupService.withdrawUser(groupId, userId, loginStatus.getUserId());
+        return new BaseResponse<>();
+    }
+
+    @Auth
+    @DeleteMapping("/{groupId}/member")
+    public BaseResponse<Void> deleteUser(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
+        groupService.deleteUser(groupId, loginStatus.getUserId());
+        return new BaseResponse<>();
+    }
+
 //    @GetMapping("/test")
 //    public BaseResponse<List<Object>> testJoin(@RequestParam("date") LocalDate date){
 //        return new BaseResponse<>(groupService.testJoin(date));

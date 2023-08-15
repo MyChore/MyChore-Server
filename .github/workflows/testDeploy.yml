@@ -43,6 +43,16 @@ jobs:
         # Secrets의 APPLICATION_SECRET 값을 application-secret.yaml에 쓰기
         echo "${{ secrets.APPLICATION_SECRET }}" > ./src/main/resources/application-secret.yaml
       shell: bash
+
+    # create mychore-firebase-private-key.json
+    - name: mychore-firebase-private-key.json
+      run: |
+        # mychore-firebase-private-key.json 생성
+        touch ./src/main/resources/mychore-firebase-private-key.json
+        
+        # Secrets에 저장된 값 mychore-firebase-private-key.json에 쓰기
+        echo "${{ secrets.FIREBASE_KEY }}" > ./src/main/resources/mychore-firebase-private-key.json
+      shell: bash
       
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
