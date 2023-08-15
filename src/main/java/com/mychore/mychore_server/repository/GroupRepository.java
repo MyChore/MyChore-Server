@@ -10,7 +10,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     Optional<Group> findByInviteCodeAndStatus(String inviteCode, String status);
 
-
     Optional<Group> findGroupByIdAndStatus(Long groupId, String status);
-
 }

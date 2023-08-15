@@ -86,6 +86,4 @@ public class Chore extends BaseEntity {
     public void updateRoomFurniture(RoomFurniture roomFurniture) {
         this.roomFurniture = roomFurniture;
     }
-
-
 }

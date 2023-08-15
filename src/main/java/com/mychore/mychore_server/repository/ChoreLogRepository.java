@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ChoreLogRepository extends JpaRepository<ChoreLog, Long> {
 
@@ -18,6 +19,7 @@ public interface ChoreLogRepository extends JpaRepository<ChoreLog, Long> {
     List<ChoreLog> findAllBySetDateAndIsCompleteAndStatus(LocalDate setDate, Boolean isComplete, String status);
     List<ChoreLog> findChoreLogsByChore(Chore chore);
 
+    Optional<ChoreLog> findFirstByChoreOrderByUpdatedAtDesc(Chore chore);
     List<Chore> findChoresBySetDateAndStatus(LocalDate setDate, String status);
 
     @EntityGraph(attributePaths = {"chore"})

@@ -4,13 +4,16 @@ import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
+@Builder
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 @Getter
 public class Notification extends BaseEntity {
 

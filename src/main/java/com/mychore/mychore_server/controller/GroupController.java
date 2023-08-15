@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class GroupController {
 
     @Auth
     @PostMapping("/member/{inviteCode}")
-    public BaseResponse<Long> joinGroup(@PathVariable("inviteCode") String inviteCode, @IsLogin LoginStatus loginStatus){
+    public BaseResponse<Long> joinGroup(@PathVariable("inviteCode") String inviteCode, @IsLogin LoginStatus loginStatus)throws IOException {
         return new BaseResponse<>(groupService.joinGroup(inviteCode, loginStatus.getUserId()));
     }
 
