@@ -19,6 +19,7 @@ import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class GroupService {
     private final RoomFurnitureRepository roomFurnitureRepository;
     private final ChoreRepository choreRepository;
     private final ChoreLogRepository choreLogRepository;
+    private final NotificationService notificationService;
 
     private final GroupAssembler groupAssembler;
 
@@ -83,7 +85,7 @@ public class GroupService {
                 .toString();
     }
 
-    public Long joinGroup(String inviteCode, Long userId){
+    public Long joinGroup(String inviteCode, Long userId)throws IOException {
         Group group = groupRepository.findByInviteCodeAndStatus(inviteCode, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_INVITATION_CODE));
 

@@ -11,6 +11,7 @@ import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.Room;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
+import com.mychore.mychore_server.global.config.ScheduleConfig;
 import com.mychore.mychore_server.global.constants.Constant;
 import com.mychore.mychore_server.global.exception.BaseException;
 import com.mychore.mychore_server.global.exception.BaseResponseCode;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -35,8 +37,9 @@ public class ChoreService {
     private final RoomRepository roomRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
     private final GroupUserRepository groupUserRepository;
-
     private final ChoreAssembler choreAssembler;
+    private final ScheduleConfig scheduleConfig;
+    private final NotificationService notificationService;
 
     public void saveChore(ChoreCreateReq choreSaveReqDto, Long loginUserId) {
         isGroupMember(choreSaveReqDto.getGroupId(), loginUserId);
@@ -46,13 +49,18 @@ public class ChoreService {
         Group group = findGroupEntity(choreSaveReqDto.getGroupId());
         RoomFurniture roomFurniture = findRoomFurnitureEntity(choreSaveReqDto.getRoomFurnitureId());
 
-        choreRepository.save(choreAssembler.toEntity(user, roomFurniture, group, choreSaveReqDto));
+        Chore chore = choreAssembler.toEntity(user, roomFurniture, group, choreSaveReqDto);
+
+        choreRepository.save(chore);
+        if (choreSaveReqDto.getIsAcceptNoti()) {
+            scheduleConfig.startScheduler(chore);
+        }
     }
 
     public ChoreSimpleResp findChore(Long choreId, Long loginUserId) {
         Chore choreEntity = findChoreEntity(choreId);
         isGroupMember(choreEntity.getGroup().getId(), loginUserId);
-        return  choreRepository.findChore(choreId);
+        return choreRepository.findChore(choreId);
     }
 
     public List<ChoreDetailResp> findChores(Long userId, Long groupId, Long roomId,
@@ -72,18 +80,22 @@ public class ChoreService {
 
         findChore.updateInfo(choreUpdateReqDto);
 
+        scheduleConfig.stopScheduler(findChore);
+        if (choreUpdateReqDto.getIsAcceptNoti()) {
+            scheduleConfig.startScheduler(findChore);
+        }
 
-        if(!findChore.getUser().getId().equals(choreUpdateReqDto.getUserId())) {
+        if (!findChore.getUser().getId().equals(choreUpdateReqDto.getUserId())) {
             findChore.updateUser(findUserEntity(choreUpdateReqDto.getUserId()));
         }
 
-        if(!findChore.getRoomFurniture().getId().equals(choreUpdateReqDto.getRoomFurnitureId())) {
+        if (!findChore.getRoomFurniture().getId().equals(choreUpdateReqDto.getRoomFurnitureId())) {
             findChore.updateRoomFurniture(findRoomFurnitureEntity(choreUpdateReqDto.getRoomFurnitureId()));
         }
     }
 
     @Transactional
-    public void setChoreLog(Long choreId, LocalDate setDate, Boolean bool, Long loginUserId) {
+    public void setChoreLog(Long choreId, LocalDate setDate, Boolean bool, Long loginUserId) throws IOException {
         Chore findChore = findChoreEntity(choreId);
 
         isGroupMember(findChore.getGroup().getId(), loginUserId);
@@ -97,12 +109,15 @@ public class ChoreService {
         } else {
             findChoreLog.updateIsComplete(bool);
         }
+        notificationService.groupChore(loginUserId, findChore.getGroup().getId(), findChore);
     }
 
     @Transactional
     public void deleteChore(Long choreId, Long loginUserId) {
         Chore choreEntity = findChoreEntity(choreId);
         isGroupMember(choreEntity.getGroup().getId(), loginUserId);
+
+        scheduleConfig.stopScheduler(choreEntity);
 
         choreEntity.setStatus(Constant.INACTIVE_STATUS);
     }
@@ -115,7 +130,7 @@ public class ChoreService {
 
         List<ChoreDetailResp> chores = choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
 
-        if (chores.size()==0) return 100;
+        if (chores.size() == 0) return 100;
 
         int count = 0;
         for (ChoreDetailResp chore : chores) {
@@ -172,7 +187,7 @@ public class ChoreService {
             throw new BaseException(BaseResponseCode.NULL_NOTI_TIME);
         }
 
-        if (choreUpdateReqDto.getLastDate()!=null && choreUpdateReqDto.getLastDate().isBefore(chore.getStartDate())) {
+        if (choreUpdateReqDto.getLastDate() != null && choreUpdateReqDto.getLastDate().isBefore(chore.getStartDate())) {
             throw new BaseException(BaseResponseCode.INVALID_LAST_DATE);
         }
     }
@@ -180,20 +195,18 @@ public class ChoreService {
 
     //  setChoreLog 파라미터 확인하는 함수
     public void isValidSetLogReqParameter(Chore chore, LocalDate setDate) {
-        if (setDate.isBefore(chore.getStartDate()) || (chore.getLastDate()!=null && setDate.isAfter(chore.getLastDate())))
+        if (setDate.isBefore(chore.getStartDate()) || (chore.getLastDate() != null && setDate.isAfter(chore.getLastDate())))
             throw new BaseException(BaseResponseCode.INVALID_LOG_DATE);
     }
 
     // saveChore Req 확인 함수
     public void isValidSaveReqBody(ChoreCreateReq choreSaveReqDto) {
-        if (choreSaveReqDto.getLastDate()!=null && choreSaveReqDto.getStartDate().isAfter(choreSaveReqDto.getLastDate())) {
+        if (choreSaveReqDto.getLastDate() != null && choreSaveReqDto.getStartDate().isAfter(choreSaveReqDto.getLastDate())) {
             throw new BaseException(BaseResponseCode.INVALID_LAST_DATE);
         }
 
-        if (choreSaveReqDto.getIsAcceptNoti() && choreSaveReqDto.getNotiTime()==null) {
+        if (choreSaveReqDto.getIsAcceptNoti() && choreSaveReqDto.getNotiTime() == null) {
             throw new BaseException(BaseResponseCode.NULL_NOTI_TIME);
         }
     }
-
-
 }
