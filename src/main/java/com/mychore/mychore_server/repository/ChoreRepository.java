@@ -21,4 +21,8 @@ public interface ChoreRepository extends JpaRepository<Chore, Long>, ChoreReposi
 
     @Query("select c, rf from Chore c left join c.roomFurniture rf where c.id =:id")
     Object getChoreWithRoomFurniture(@Param("id") Long id);
+
+    void deleteByUser(User user);
+
+    void deleteByGroup(Group group);
 }

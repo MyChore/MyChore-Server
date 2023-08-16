@@ -4,6 +4,7 @@ import com.mychore.mychore_server.dto.user.request.PatchProfileReq;
 import com.mychore.mychore_server.global.constants.Gender;
 import com.mychore.mychore_server.global.constants.Provider;
 import com.mychore.mychore_server.entity.BaseEntity;
+import com.mychore.mychore_server.global.entityListener.UserEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -20,6 +21,7 @@ import static com.mychore.mychore_server.global.constants.Constant.INACTIVE_STAT
 @DynamicUpdate
 @Getter
 @SQLDelete(sql = "UPDATE user SET status = 'inactive', updated_at = current_timestamp WHERE user_id = ?")
+@EntityListeners(UserEntityListener.class)
 public class User extends BaseEntity {
 
     @Id

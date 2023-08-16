@@ -6,11 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE furniture SET status = 'inactive', updated_at = current_timestamp WHERE furniture_id = ?")
 public class Furniture extends BaseEntity {
 
     @Id

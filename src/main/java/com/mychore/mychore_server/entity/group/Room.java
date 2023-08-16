@@ -3,15 +3,19 @@ package com.mychore.mychore_server.entity.group;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
 import com.mychore.mychore_server.global.constants.RoomType;
 import com.mychore.mychore_server.entity.BaseEntity;
+import com.mychore.mychore_server.global.entityListener.RoomEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE room SET status = 'inactive', updated_at = current_timestamp WHERE room_id = ?")
+@EntityListeners(RoomEntityListener.class)
 public class Room extends BaseEntity {
 
     @Id

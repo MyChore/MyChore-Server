@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @DynamicInsert
 @DynamicUpdate
 @Getter
+@SQLDelete(sql = "UPDATE chore_log SET status = 'inactive', updated_at = current_timestamp WHERE chore_log_id = ?")
 public class ChoreLog extends BaseEntity {
 
     @Id

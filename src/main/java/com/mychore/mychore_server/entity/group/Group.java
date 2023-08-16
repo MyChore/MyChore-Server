@@ -2,16 +2,20 @@ package com.mychore.mychore_server.entity.group;
 
 import com.mychore.mychore_server.global.constants.FloorType;
 import com.mychore.mychore_server.entity.BaseEntity;
+import com.mychore.mychore_server.global.entityListener.GroupEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "floor_group")
+@SQLDelete(sql = "UPDATE floor_group SET status = 'inactive', updated_at = current_timestamp WHERE group_id = ?")
+@EntityListeners(GroupEntityListener.class)
 public class Group extends BaseEntity {
 
     @Id

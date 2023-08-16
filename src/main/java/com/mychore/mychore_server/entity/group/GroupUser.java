@@ -7,11 +7,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @DynamicInsert @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE group_user SET status = 'inactive', updated_at = current_timestamp WHERE group_user_id = ?")
 public class GroupUser extends BaseEntity {
 
     @Id
