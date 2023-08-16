@@ -92,4 +92,11 @@ public class GroupController {
         return new BaseResponse<>();
     }
 
+    @Auth
+    @DeleteMapping("/{groupId}")
+    public BaseResponse<Void> deleteGroup(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
+        groupService.deleteGroup(groupId, loginStatus.getUserId());
+        return new BaseResponse<>();
+    }
+
 }
