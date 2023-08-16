@@ -69,8 +69,7 @@ public class UserService {
         User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
         scheduleConfig.logout(user);
-        user.withdraw();
-        userRepository.save(user);
+        userRepository.delete(user);
     }
 
     // 프로필 조회

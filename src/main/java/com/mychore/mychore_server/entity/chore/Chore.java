@@ -7,12 +7,14 @@ import com.mychore.mychore_server.entity.BaseEntity;
 import com.mychore.mychore_server.entity.group.Group;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
+import com.mychore.mychore_server.global.entityListener.ChoreEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,6 +28,8 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 @Getter
+@SQLDelete(sql = "UPDATE chore SET status = 'inactive', updated_at = current_timestamp WHERE chore_id = ?")
+@EntityListeners(ChoreEntityListener.class)
 public class Chore extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

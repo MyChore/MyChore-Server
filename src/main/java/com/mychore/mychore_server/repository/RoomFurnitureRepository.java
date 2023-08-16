@@ -12,4 +12,6 @@ public interface RoomFurnitureRepository extends JpaRepository<RoomFurniture, Lo
     Optional<RoomFurniture> findRoomFurnitureByIdAndStatus(Long roomFurnitureId, String status);
 
     List<RoomFurniture> findAllByRoomAndStatus(Room room, String status);
+
+    void deleteByRoom(Room room);
 }

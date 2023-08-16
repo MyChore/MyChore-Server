@@ -14,4 +14,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Optional<Room> findRoomByIdAndStatus(Long roomId, String status);
 
     List<Room> findRoomsByGroupAndStatus(Group group, String status);
+
+    void deleteByGroup(Group group);
 }

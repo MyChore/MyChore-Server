@@ -7,6 +7,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.hibernate.annotations.SQLDelete;
 
 @Builder
 @Entity
@@ -15,6 +20,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Getter
+@SQLDelete(sql = "UPDATE notification SET status = 'inactive', updated_at = current_timestamp WHERE notification_id = ?")
 public class Notification extends BaseEntity {
 
     @Id

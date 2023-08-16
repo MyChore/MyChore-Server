@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @Getter
+@SQLDelete(sql = "UPDATE user_agree SET status = 'inactive', updated_at = current_timestamp WHERE user_agree_id = ?")
 public class UserAgree extends BaseEntity {
 
     @Id

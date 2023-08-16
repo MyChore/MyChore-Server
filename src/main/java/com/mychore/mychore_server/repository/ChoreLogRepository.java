@@ -25,4 +25,6 @@ public interface ChoreLogRepository extends JpaRepository<ChoreLog, Long> {
     @EntityGraph(attributePaths = {"chore"})
     @Query("select l, c from ChoreLog l left join l.chore c where l.setDate =:setDate")
     List<Object> getChoreLogWithChore(@Param("setDate") LocalDate setDate);
+
+    void deleteByChore(Chore chore);
 }

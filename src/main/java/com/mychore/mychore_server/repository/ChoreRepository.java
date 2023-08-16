@@ -29,4 +29,8 @@ public interface ChoreRepository extends JpaRepository<Chore, Long>, ChoreReposi
     List<Chore> findAllByIsAcceptNotiAndStatus(Boolean isAcceptNoti, String Status);
 
     List<Chore> findAllByUserAndIsAcceptNotiAndStatus(User user, Boolean isAcceptNoti, String Status);
+
+    void deleteByUser(User user);
+
+    void deleteByGroup(Group group);
 }
