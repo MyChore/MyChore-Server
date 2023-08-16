@@ -32,5 +32,7 @@ public class UserEntityListener {
 
         // MEMBER인 그룹 유저 삭제
         groupUserRepository.deleteByUser(user);
+
+        user.removeTokens();
     }
 }

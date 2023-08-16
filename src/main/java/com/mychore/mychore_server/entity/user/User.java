@@ -79,10 +79,6 @@ public class User extends BaseEntity {
 
     public void removeTokens() {
         this.refreshToken = null;
-    }
-
-    public void withdraw() {
-        removeTokens();
-        this.setStatus(INACTIVE_STATUS);
+        this.deviceToken = null;
     }
 }
