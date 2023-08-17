@@ -1,15 +1,11 @@
 package com.mychore.mychore_server.dto.Group.Res;
 
 import com.mychore.mychore_server.dto.Group.Req.InfoList.GetRoomInfoDTO;
-import com.mychore.mychore_server.dto.Group.Req.InfoList.RoomInfoDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.UserInfoDTO;
-import com.mychore.mychore_server.entity.group.Group;
-import com.mychore.mychore_server.entity.group.GroupUser;
-import com.mychore.mychore_server.entity.group.Room;
-import com.mychore.mychore_server.entity.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +14,7 @@ public class StaticDataResDTO {
     String groupName;
     String floorTypeName;
     String inviteCode;
-    LocalDateTime createDate;
+    LocalDate createDate;
     List<UserInfoDTO> memberList;
     List<GetRoomInfoDTO> roomList;
 
@@ -29,7 +25,7 @@ public class StaticDataResDTO {
         this.groupName = groupName;
         this.floorTypeName = floorTypeName;
         this.inviteCode = inviteCode;
-        this.createDate = createDate;
+        this.createDate = createDate.toLocalDate();
         this.memberList = memberList;
         this.roomList = roomList;
     }

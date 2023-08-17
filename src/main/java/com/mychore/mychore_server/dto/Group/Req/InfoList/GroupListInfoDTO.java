@@ -5,6 +5,7 @@ import com.mychore.mychore_server.global.constants.Role;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class GroupListInfoDTO {
     Long groupId;
     String groupName;
     String floorTypeName;
-    LocalDateTime updateDate;
+    LocalDate updateDate;
     Role role;
     List<UserInfoDTO> memberList;
 
@@ -22,7 +23,7 @@ public class GroupListInfoDTO {
         this.groupId = groupId;
         this.groupName = groupName;
         this.floorTypeName = floorTypeName;
-        this.updateDate = updateDate;
+        this.updateDate = updateDate.toLocalDate();
     }
 
     public void SetMemberList(List<UserInfoDTO> memberList) {
