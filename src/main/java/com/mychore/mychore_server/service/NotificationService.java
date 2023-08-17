@@ -51,7 +51,7 @@ public class NotificationService {
     private String getAccessToken() throws IOException {
 
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource("mychore-firbase-private-key.json").getInputStream())
+                .fromStream(new ClassPathResource("mychore-firebase-private-key.json").getInputStream())
                 .createScoped(Arrays.asList(SCOPES));
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
