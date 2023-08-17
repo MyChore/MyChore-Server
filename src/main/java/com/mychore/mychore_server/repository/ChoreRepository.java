@@ -33,4 +33,6 @@ public interface ChoreRepository extends JpaRepository<Chore, Long>, ChoreReposi
     void deleteByUser(User user);
 
     void deleteByGroup(Group group);
+
+    void deleteByGroupAndUser(Group group, User user);
 }
