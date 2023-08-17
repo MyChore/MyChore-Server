@@ -19,7 +19,6 @@ import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +38,6 @@ public class GroupService {
     private final UserRepository userRepository;
     private final GroupUserRepository groupUserRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
-    private final ChoreRepository choreRepository;
-    private final ChoreLogRepository choreLogRepository;
-    private final NotificationService notificationService;
 
     private final GroupAssembler groupAssembler;
 
@@ -85,7 +81,7 @@ public class GroupService {
                 .toString();
     }
 
-    public Long joinGroup(String inviteCode, Long userId)throws IOException {
+    public Long joinGroup(String inviteCode, Long userId){
         Group group = groupRepository.findByInviteCodeAndStatus(inviteCode, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_INVITATION_CODE));
 
@@ -188,30 +184,6 @@ public class GroupService {
         return groupListInfoDTOList;
     }
 
-
-    public List<RoomChoreResDTO> getRoomChoreInfo(Long groupId, Long roomId, LocalDate date, Long userId){
-        CheckResDTO check = validationCheck(groupId, userId);
-        Room room = roomRepository.findRoomByIdAndGroupAndStatus(roomId, check.getGroup(), ACTIVE_STATUS)
-                .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_ROOM));
-        List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
-
-        List<ChoreLog> todayChoreList = choreLogRepository.findAllBySetDateAndStatus(date, ACTIVE_STATUS);
-        List<RoomChoreResDTO> resDTO = new ArrayList<>();
-        for(RoomFurniture furniture: furnitureList){
-            List<Chore> choreList = choreRepository.findAllByRoomFurnitureAndStatus(furniture, ACTIVE_STATUS);
-            for(ChoreLog todayChore: todayChoreList) {
-                for (Chore chore : choreList) {
-                    if (todayChore.getChore() == chore) {
-                        RoomChoreResDTO roomChoreResDTO = groupAssembler.toRoomChoreResDto(chore);
-                        roomChoreResDTO.setIsComplete(todayChore.getIsComplete());
-                        resDTO.add(roomChoreResDTO);
-                    }
-                }
-            }
-        }
-        return resDTO;
-    }
-
     private CheckResDTO ownerCheck(Long groupId, Long userId){
 //        validation check
         CheckResDTO check = validationCheck(groupId, userId);
@@ -252,68 +224,22 @@ public class GroupService {
         return getStaticData(groupId, userId);
     }
 
-    public List<RemainChoreResDTO> getRemainChore(Long groupId, LocalDate date, Long userId){
-        CheckResDTO check = validationCheck(groupId, userId);
-        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(check.getGroup(), ACTIVE_STATUS);
-        List<ChoreLog> todayChoreList = choreLogRepository.findAllBySetDateAndIsCompleteAndStatus(date, false, ACTIVE_STATUS);
-
-        List<RemainChoreResDTO> resDTO = new ArrayList<>();
-        for(Room room: roomList){
-            List<RoomFurniture> furnitureList = roomFurnitureRepository.findAllByRoomAndStatus(room, ACTIVE_STATUS);
-            int count = 0;
-            for(RoomFurniture furniture: furnitureList){
-                for(ChoreLog choreLog: todayChoreList){
-                    if(choreLog.getChore().getRoomFurniture()==furniture){
-                        count+=1;
-                    }
-                }
-            }
-            RemainChoreResDTO remainChoreResDTO = groupAssembler.toRemainChoreResDto(room, count);
-            resDTO.add(remainChoreResDTO);
-        }
-        return resDTO;
-    }
-
     public void withdrawUser(Long groupId, Long memberId, Long ownerId){
-        CheckResDTO ownerCheck = ownerCheck(groupId, ownerId);
+        ownerCheck(groupId, ownerId);
         CheckResDTO memberCheck = validationCheck(groupId, memberId);
-        groupUserRepository.findByUserAndGroupAndRoleAndStatus
+        GroupUser groupUser = groupUserRepository.findByUserAndGroupAndRoleAndStatus
                         (memberCheck.getUser(), memberCheck.getGroup(), MEMBER, ACTIVE_STATUS)
                         .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
 
-        setInactive(memberCheck);
+        groupUserRepository.delete(groupUser);
     }
 
     public void deleteUser(Long groupId, Long userId){
         CheckResDTO memberCheck = validationCheck(groupId, userId);
-        groupUserRepository.findByUserAndGroupAndRoleAndStatus
+        GroupUser groupUser = groupUserRepository.findByUserAndGroupAndRoleAndStatus
                         (memberCheck.getUser(), memberCheck.getGroup(), MEMBER, ACTIVE_STATUS)
                         .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
-        setInactive(memberCheck);
-    }
 
-    private void setInactive(CheckResDTO checkResDTO){
-        GroupUser groupUser = checkResDTO.getGroupUser();
-        List<Chore> choreList = choreRepository.findAllByGroupAndUserAndStatus(checkResDTO.getGroup(), checkResDTO.getUser(), ACTIVE_STATUS);
-        for(Chore chore: choreList){
-            List<ChoreLog> choreLogList = choreLogRepository.findChoreLogsByChore(chore);
-            for(ChoreLog choreLog: choreLogList){
-                choreLog.setStatus(INACTIVE_STATUS);
-                choreLogRepository.save(choreLog);
-            }
-            chore.setStatus(INACTIVE_STATUS);
-            choreRepository.save(chore);
-        }
-        groupUser.setStatus(INACTIVE_STATUS);
-        groupUserRepository.save(groupUser);
+        groupUserRepository.delete(groupUser);
     }
-
-//    public List<Object> testJoin(LocalDate date){
-//
-//        List<Object> choreLogList = choreLogRepository.getChoreLogWithChore(date);
-////        for(Object choreLog : choreLogList){
-////            choreLog.
-////        }
-//        return choreLogList;
-//    }
 }
