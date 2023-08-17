@@ -1,4 +1,4 @@
-package com.mychore.mychore_server.dto.Group.Res;
+package com.mychore.mychore_server.dto.chore.response;
 
 import lombok.Builder;
 import lombok.Getter;

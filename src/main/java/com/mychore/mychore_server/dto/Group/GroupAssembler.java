@@ -3,6 +3,7 @@ package com.mychore.mychore_server.dto.Group;
 import com.mychore.mychore_server.dto.Group.Req.AddFurnitureReqDTO;
 import com.mychore.mychore_server.dto.Group.Req.InfoList.*;
 import com.mychore.mychore_server.dto.Group.Res.*;
+import com.mychore.mychore_server.dto.chore.response.RemainChoreResDTO;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.group.*;
 import com.mychore.mychore_server.entity.user.User;
@@ -154,22 +155,6 @@ public class GroupAssembler {
                 .createDate(group.getCreatedAt())
                 .memberList(memberList)
                 .roomList(roomList)
-                .build();
-    }
-
-    public RoomChoreResDTO toRoomChoreResDto(Chore chore){
-        return RoomChoreResDTO.builder()
-                .choreId(chore.getId())
-                .roomFurnitureId(chore.getRoomFurniture().getId())
-                .userId(chore.getUser().getId())
-                .name(chore.getName())
-                .build();
-    }
-
-    public RemainChoreResDTO toRemainChoreResDto(Room room, Integer remainChores){
-        return RemainChoreResDTO.builder()
-                .roomId(room.getId())
-                .remainChores(remainChores)
                 .build();
     }
 
