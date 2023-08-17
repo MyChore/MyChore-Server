@@ -5,6 +5,7 @@ import com.mychore.mychore_server.dto.chore.request.ChoreCreateReq;
 import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
 import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
 import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
+import com.mychore.mychore_server.dto.chore.response.RemainChoreResDTO;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mychore.mychore_server.global.constants.Constant.ACTIVE_STATUS;
@@ -69,6 +71,28 @@ public class ChoreService {
         isValidfindChoresParameter(fromTime, toTime);
 
         return choreRepository.findChores(userId, groupId, roomId, fromTime, toTime);
+    }
+
+    public List<RemainChoreResDTO> getChoreCounter(Long userId, Long groupId,
+                                                   LocalDate date, Long loginUserId) {
+        isGroupMember(groupId, loginUserId);
+
+        Group group = findGroupEntity(groupId);
+        List<Room> roomList = roomRepository.findRoomsByGroupAndStatus(group, ACTIVE_STATUS);
+
+        List<RemainChoreResDTO> resDTOList = new ArrayList<>();
+        for(Room room: roomList){
+            List<ChoreDetailResp> list = choreRepository.findChores(userId, groupId, room.getId(), date, date);
+            Integer counter = 0;
+            for(ChoreDetailResp resp: list){
+                if(!resp.getCompleteStatus()){
+                    counter++;
+                }
+            }
+            resDTOList.add(choreAssembler.toRemainChoreResDto(room, counter));
+        }
+
+        return resDTOList;
     }
 
     @Transactional

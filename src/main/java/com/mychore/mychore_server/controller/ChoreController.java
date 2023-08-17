@@ -5,6 +5,7 @@ import com.mychore.mychore_server.dto.chore.request.ChoreCreateReq;
 import com.mychore.mychore_server.dto.chore.request.ChoreUpdateReq;
 import com.mychore.mychore_server.dto.chore.response.ChoreDetailResp;
 import com.mychore.mychore_server.dto.chore.response.ChoreSimpleResp;
+import com.mychore.mychore_server.dto.chore.response.RemainChoreResDTO;
 import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.global.resolver.Auth;
 import com.mychore.mychore_server.global.resolver.IsLogin;
@@ -46,6 +47,17 @@ public class ChoreController {
             @IsLogin LoginStatus loginStatus) {
         return new BaseResponse<>(choreService.findChores(userId, groupId, roomId, fromDate, toDate, loginStatus.getUserId()));
     }
+
+    @Auth
+    @GetMapping("/remain")
+    public BaseResponse<List<RemainChoreResDTO>> getChoreCounterAPI(
+            @RequestParam(required = false) Long userId,
+            @RequestParam Long groupId,
+            @RequestParam LocalDate date,
+            @IsLogin LoginStatus loginStatus) {
+        return new BaseResponse<>(choreService.getChoreCounter(userId, groupId, date, loginStatus.getUserId()));
+    }
+
 
     // 집안일 단건 조회
     @Auth
