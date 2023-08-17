@@ -242,4 +242,10 @@ public class GroupService {
 
         groupUserRepository.delete(groupUser);
     }
+
+    public void deleteGroup(Long groupId, Long userId){
+        CheckResDTO check = ownerCheck(groupId, userId);
+
+        groupRepository.delete(check.getGroup());
+    }
 }
