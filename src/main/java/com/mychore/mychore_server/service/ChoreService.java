@@ -83,7 +83,13 @@ public class ChoreService {
         List<RemainChoreResDTO> resDTOList = new ArrayList<>();
         for(Room room: roomList){
             List<ChoreDetailResp> list = choreRepository.findChores(userId, groupId, room.getId(), date, date);
-            resDTOList.add(choreAssembler.toRemainChoreResDto(room, list.size()));
+            Integer counter = 0;
+            for(ChoreDetailResp resp: list){
+                if(!resp.getCompleteStatus()){
+                    counter++;
+                }
+            }
+            resDTOList.add(choreAssembler.toRemainChoreResDto(room, counter));
         }
 
         return resDTOList;
