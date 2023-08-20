@@ -9,11 +9,9 @@ import com.mychore.mychore_server.dto.chore.response.RemainChoreResDTO;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
-import com.mychore.mychore_server.entity.group.Room;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.config.ScheduleConfig;
-import com.mychore.mychore_server.global.constants.Constant;
 import com.mychore.mychore_server.global.exception.BaseException;
 import com.mychore.mychore_server.global.exception.BaseResponseCode;
 import com.mychore.mychore_server.repository.*;
@@ -36,7 +34,6 @@ public class ChoreService {
     private final ChoreLogRepository choreLogRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
-    private final RoomRepository roomRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
     private final GroupUserRepository groupUserRepository;
     private final ChoreAssembler choreAssembler;
@@ -136,14 +133,13 @@ public class ChoreService {
         notificationService.groupChore(loginUserId, findChore.getGroup().getId(), findChore);
     }
 
-    @Transactional
     public void deleteChore(Long choreId, Long loginUserId) {
-        Chore choreEntity = findChoreEntity(choreId);
-        isGroupMember(choreEntity.getGroup().getId(), loginUserId);
+        Chore findChore = findChoreEntity(choreId);
+        isGroupMember(findChore.getGroup().getId(), loginUserId);
 
-        scheduleConfig.stopScheduler(choreEntity);
+        scheduleConfig.stopScheduler(findChore);
 
-        choreEntity.setStatus(Constant.INACTIVE_STATUS);
+        choreRepository.delete(findChore);
     }
 
     public int getChoreCompletionRate(Long userId, Long groupId, Long roomId,
