@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -171,8 +170,9 @@ public class NotificationService {
     }
 
     // 그룹 삭제 알림
-    public void deleteGroup(User user, Group group) throws IOException {
-
+    public void deleteGroup(Long userId, Long groupId) throws IOException {
+        User user = userRepository.findByIdAndStatus(userId, ACTIVE_STATUS).orElseThrow(()->new BaseException(BaseResponseCode.NOT_FOUND_USER));
+        Group group = groupRepository.findGroupByIdAndStatus(groupId, ACTIVE_STATUS).orElseThrow(()->new BaseException(BaseResponseCode.NOT_FOUND_GROUP));
         List<GroupUser> groupUsers = groupUserRepository.findGroupUsersByGroupAndStatus(group, ACTIVE_STATUS);
 
         List<User> findUsers = groupUsers.stream().map(GroupUser::getUser)

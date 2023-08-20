@@ -94,7 +94,7 @@ public class GroupController {
 
     @Auth
     @DeleteMapping("/{groupId}")
-    public BaseResponse<Void> deleteGroup(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus){
+    public BaseResponse<Void> deleteGroup(@PathVariable("groupId") Long groupId, @IsLogin LoginStatus loginStatus) throws IOException {
         groupService.deleteGroup(groupId, loginStatus.getUserId());
         return new BaseResponse<>();
     }

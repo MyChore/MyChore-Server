@@ -19,6 +19,7 @@ import com.mychore.mychore_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class GroupService {
     private final UserRepository userRepository;
     private final GroupUserRepository groupUserRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
-
+    private final NotificationService notificationService;
     private final GroupAssembler groupAssembler;
 
     public Furniture addFurniture(AddFurnitureReqDTO reqDTO){
@@ -81,12 +82,14 @@ public class GroupService {
                 .toString();
     }
 
-    public Long joinGroup(String inviteCode, Long userId){
+    public Long joinGroup(String inviteCode, Long userId) throws IOException {
         Group group = groupRepository.findByInviteCodeAndStatus(inviteCode, ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_INVITATION_CODE));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER));
+
+        notificationService.newMember(user,group);
 
         groupUserRepository.findByUserAndGroupAndStatus(user, group, ACTIVE_STATUS)
                 .ifPresent( m -> { throw new BaseException(BaseResponseCode.ALREADY_JOIN_GROUP); });
@@ -239,13 +242,13 @@ public class GroupService {
         GroupUser groupUser = groupUserRepository.findByUserAndGroupAndRoleAndStatus
                         (memberCheck.getUser(), memberCheck.getGroup(), MEMBER, ACTIVE_STATUS)
                         .orElseThrow(() -> new BaseException(BaseResponseCode.INVALID_DELETE_GROUP)); //그룹장의 추방을 요청한 경우
-
         groupUserRepository.delete(groupUser);
     }
 
-    public void deleteGroup(Long groupId, Long userId){
+    public void deleteGroup(Long groupId, Long userId) throws IOException {
         CheckResDTO check = ownerCheck(groupId, userId);
 
+        notificationService.deleteGroup(userId, groupId);
         groupRepository.delete(check.getGroup());
     }
 }
