@@ -9,6 +9,7 @@ import com.mychore.mychore_server.dto.chore.response.RemainChoreResDTO;
 import com.mychore.mychore_server.entity.chore.Chore;
 import com.mychore.mychore_server.entity.chore.ChoreLog;
 import com.mychore.mychore_server.entity.group.Group;
+import com.mychore.mychore_server.entity.group.Room;
 import com.mychore.mychore_server.entity.group.RoomFurniture;
 import com.mychore.mychore_server.entity.user.User;
 import com.mychore.mychore_server.global.config.ScheduleConfig;
@@ -32,6 +33,7 @@ public class ChoreService {
 
     private final ChoreRepository choreRepository;
     private final ChoreLogRepository choreLogRepository;
+    private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final RoomFurnitureRepository roomFurnitureRepository;
