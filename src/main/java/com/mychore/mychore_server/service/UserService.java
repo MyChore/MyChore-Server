@@ -52,6 +52,7 @@ public class UserService {
         User user = userRepository.findByEmailAndProviderAndStatus(userLogInReq.getEmail(), Provider.getByName(userLogInReq.getProvider()), ACTIVE_STATUS)
                 .orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_EMAIL));
         scheduleConfig.login(user);
+        user.updateDeviceToken(userLogInReq.getDeviceToken());
         return UserTokenRes.toDto(jwtUtils.createToken(user));
     }
 

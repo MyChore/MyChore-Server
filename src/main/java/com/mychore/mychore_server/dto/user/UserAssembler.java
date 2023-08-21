@@ -28,6 +28,7 @@ public class UserAssembler {
                 .gender(Gender.getByName(userSignUpReq.getGender()))
                 .birth(LocalDate.parse(userSignUpReq.getBirth()))
                 .provider(Provider.getByName(userSignUpReq.getProvider()))
+                .deviceToken(userSignUpReq.getDeviceToken())
                 .build();
     }
 

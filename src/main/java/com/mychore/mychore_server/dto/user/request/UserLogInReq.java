@@ -11,4 +11,5 @@ public class UserLogInReq {
     private String email;
     @NotBlank(message = "U0011")
     private String provider;
+    private String deviceToken;
 }
