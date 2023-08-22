@@ -13,6 +13,6 @@ public class PostGroupReqDTO {
     private String floorName;
     @NotNull(message = "GL006")
     private FloorType floorType;
-    @NotNull(message = "GL006")
+//    @NotNull(message = "GL006")
     private List<RoomInfoDTO> rooms;
 }
