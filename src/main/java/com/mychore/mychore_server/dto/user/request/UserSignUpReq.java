@@ -21,4 +21,5 @@ public class UserSignUpReq {
     private Boolean is14Over;
     @NotNull(message = "U0013")
     private Boolean isAcceptEmail;
+    private String deviceToken;
 }

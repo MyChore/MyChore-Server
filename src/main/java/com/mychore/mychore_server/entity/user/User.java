@@ -53,7 +53,7 @@ public class User extends BaseEntity {
     private String deviceToken;
 
     @Builder
-    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgUrl, @NonNull Provider provider) {
+    public User(@NonNull String email, @NonNull String nickname, Gender gender, LocalDate birth, String imgUrl, @NonNull Provider provider, String deviceToken) {
         this.email = email;
         this.nickname = nickname;
         this.gender = gender;
@@ -75,6 +75,10 @@ public class User extends BaseEntity {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
     }
 
     public void removeTokens() {

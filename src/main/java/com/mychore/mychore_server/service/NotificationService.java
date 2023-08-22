@@ -103,7 +103,8 @@ public class NotificationService {
                     .filter(findUser -> findUser.getStatus().equals(ACTIVE_STATUS)
                             && !findUser.equals(user)).toList();
             for (User u : findUsers) {
-                if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeDoneNoti()) {
+                if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeDoneNoti()
+                        && u.getDeviceToken() != null) {
                     deviceTokens.add(u.getDeviceToken());
                 }
             }
@@ -154,7 +155,8 @@ public class NotificationService {
 
         List<String> deviceTokens = new ArrayList<>();
         for (User u : findUsers) {
-            if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeNewUserNoti()) {
+            if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeNewUserNoti()
+                    && u.getDeviceToken() != null) {
                 deviceTokens.add(u.getDeviceToken());
             }
         }
@@ -181,7 +183,8 @@ public class NotificationService {
 
         List<String> deviceTokens = new ArrayList<>();
         for (User u : findUsers) {
-            if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeDeleteNoti()) {
+            if (userAgreeRepository.findByUserIdAndStatus(u.getId(), ACTIVE_STATUS).orElseThrow(() -> new BaseException(BaseResponseCode.NOT_FOUND_USER)).getIsAgreeDeleteNoti()
+                    && u.getDeviceToken() != null) {
                 deviceTokens.add(u.getDeviceToken());
             }
         }
