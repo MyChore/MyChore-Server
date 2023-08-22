@@ -60,13 +60,16 @@ public class GroupService {
 
         PostGroupResDTO resDTO = groupAssembler.toPostGroupResDto(group.getId(), inviteCode, groupUser.getId());
 
-        List<Long> roomIdList = new ArrayList<>();
-        for(RoomInfoDTO roomInfoDTO : reqDTO.getRooms()){
-            Room room = groupAssembler.toRoomEntity(group, roomInfoDTO);
-            roomIdList.add(roomRepository.save(room).getId());
+        if(reqDTO.getRooms() != null){
+            List<Long> roomIdList = new ArrayList<>();
+            for(RoomInfoDTO roomInfoDTO : reqDTO.getRooms()){
+                Room room = groupAssembler.toRoomEntity(group, roomInfoDTO);
+                roomIdList.add(roomRepository.save(room).getId());
+            }
+
+            resDTO.SetRoomIdList(roomIdList);
         }
 
-        resDTO.SetRoomIdList(roomIdList);
         return resDTO;
     }
 
